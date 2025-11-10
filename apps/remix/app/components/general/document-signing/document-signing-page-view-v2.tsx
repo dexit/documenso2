@@ -248,11 +248,11 @@ export const DocumentSigningPageViewV2 = () => {
 
               {!hidePoweredBy && (
                 <a
-                  href="https://documenso.com"
+                  href="https://pathwayl.ink"
                   target="_blank"
                   className="bg-primary text-primary-foreground fixed bottom-0 right-0 z-40 hidden cursor-pointer rounded-tl px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100 lg:block"
                 >
-                  <span>Powered by</span>
+                  <span>Powered by </span>
                   <BrandingLogo className="ml-2 inline-block h-[14px]" />
                 </a>
               )}

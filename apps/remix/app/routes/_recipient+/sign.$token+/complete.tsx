@@ -18,7 +18,6 @@ import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-emai
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
 import type { Document } from '@documenso/prisma/types/document-legacy-schema';
-import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -200,7 +199,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             ))}
 
           <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-            <DocumentShareButton documentId={document.id} token={recipient.token} />
+            {/*    <DocumentShareButton documentId={document.id} token={recipient.token} /> */}
 
             {isDocumentCompleted(document.status) && (
               <EnvelopeDownloadDialog

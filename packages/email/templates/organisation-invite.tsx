@@ -28,7 +28,7 @@ export type OrganisationInviteEmailProps = {
 
 export const OrganisationInviteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
-  baseUrl = 'https://documenso.com',
+  baseUrl = 'https://pathwayl.ink',
   senderName = 'John Doe',
   organisationName = 'Organisation Name',
   token = '',
@@ -36,7 +36,7 @@ export const OrganisationInviteEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Accept invitation to join an organisation on Documenso`;
+  const previewText = msg`Accept invitation to join an organisation on PG eSign`;
 
   return (
     <Html>
@@ -66,7 +66,7 @@ export const OrganisationInviteEmailTemplate = ({
 
             <Section className="p-2 text-slate-500">
               <Text className="text-center text-lg font-medium text-black">
-                <Trans>Join {organisationName} on Documenso</Trans>
+                <Trans>Join {organisationName} on PG eSign</Trans>
               </Text>
 
               <Text className="my-1 text-center text-base">
@@ -90,12 +90,14 @@ export const OrganisationInviteEmailTemplate = ({
                 >
                   <Trans>Accept</Trans>
                 </Button>
+                { /*
                 <Button
                   className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
                   href={`${baseUrl}/organisation/decline/${token}`}
                 >
                   <Trans>Decline</Trans>
                 </Button>
+                */ }
               </Section>
             </Section>
           </Container>

@@ -9,6 +9,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -23,7 +24,7 @@ import { OrganisationLeaveDialog } from '../dialogs/organisation-leave-dialog';
 export const UserOrganisationsTable = () => {
   const { _, i18n } = useLingui();
   const { user, organisations } = useSession();
-
+  const isUserAdmin = isAdmin(user);
   const { data, isLoading, isLoadingError } = trpc.organisation.getMany.useQuery(undefined, {
     initialData: organisations.map((org) => ({
       ...org,
@@ -95,22 +96,23 @@ export const UserOrganisationsTable = () => {
                 </Link>
               </Button>
             )}
-
-            <OrganisationLeaveDialog
-              organisationId={row.original.id}
-              organisationName={row.original.name}
-              organisationAvatarImageId={row.original.avatarImageId}
-              role={row.original.currentOrganisationRole}
-              trigger={
-                <Button
-                  variant="destructive"
-                  disabled={row.original.ownerUserId === user.id}
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <Trans>Leave</Trans>
-                </Button>
-              }
-            />
+            {isUserAdmin && (
+              <OrganisationLeaveDialog
+                organisationId={row.original.id}
+                organisationName={row.original.name}
+                organisationAvatarImageId={row.original.avatarImageId}
+                role={row.original.currentOrganisationRole}
+                trigger={
+                  <Button
+                    variant="destructive"
+                    disabled={row.original.ownerUserId === user.id}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trans>Leave</Trans>
+                  </Button>
+                }
+              />
+            )}
           </div>
         ),
       },

@@ -366,12 +366,12 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-                Want to send slick signing links like this one?{' '}
+              Have any questions ?{' '}
                 <Link
-                  to="https://documenso.com"
+                  to="https://pathwaygroup.co.uk"
                   className="text-documenso-700 hover:text-documenso-600"
                 >
-                  Check out Documenso.
+                  Check out Pathway Group.
                 </Link>
               </Trans>
             </p>
@@ -465,12 +465,12 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-                Want to send slick signing links like this one?{' '}
+              Have any questions ?{' '}
                 <Link
-                  to="https://documenso.com"
+                  to="https://pathwaygroup.co.uk"
                   className="text-documenso-700 hover:text-documenso-600"
                 >
-                  Check out Documenso.
+                  Check out Pathway Group.
                 </Link>
               </Trans>
             </p>

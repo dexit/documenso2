@@ -5,7 +5,6 @@ import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
-import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -26,7 +25,6 @@ import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-emai
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
@@ -334,12 +332,12 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
   if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
     return (
       <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-16 xl:pt-24">
-        <SigningCard3D
+        {/* }  <SigningCard3D
           name={recipient.name}
           signature={recipientSignature}
           signingCelebrationImage={signingCelebration}
         />
-
+*/}
         <div className="relative mt-2 flex w-full flex-col items-center">
           <div className="mt-8 flex items-center text-center text-red-600">
             <Clock8 className="mr-2 h-5 w-5" />
@@ -366,7 +364,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-              Have any questions ?{' '}
+                Have any questions ?{' '}
                 <Link
                   to="https://pathwaygroup.co.uk"
                   className="text-documenso-700 hover:text-documenso-600"
@@ -433,12 +431,13 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
   if (envelope.deletedAt || envelope.status === DocumentStatus.REJECTED) {
     return (
       <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-16 xl:pt-24">
+        {/*
         <SigningCard3D
           name={recipient.name}
           signature={recipientSignature || undefined}
           signingCelebrationImage={signingCelebration}
         />
-
+       */}
         <div className="relative mt-2 flex w-full flex-col items-center">
           <div className="mt-8 flex items-center text-center text-red-600">
             <Clock8 className="mr-2 h-5 w-5" />
@@ -465,7 +464,7 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
           ) : (
             <p className="text-muted-foreground/60 mt-36 text-sm">
               <Trans>
-              Have any questions ?{' '}
+                Have any questions ?{' '}
                 <Link
                   to="https://pathwaygroup.co.uk"
                   className="text-documenso-700 hover:text-documenso-600"

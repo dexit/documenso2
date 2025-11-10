@@ -39,7 +39,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const typedSigningVolume: SigningVolume[] = leaderboard.map((item) => ({
     ...item,
     name: item.name || '',
-    createdAt: item.createdAt || new Date(),
+    createdAt: item.createdAt ? new Date(item.createdAt) : new Date(),
   }));
 
   return {

@@ -1,7 +1,14 @@
 import { useMemo } from 'react';
 
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
+import {
+  Building2Icon,
+  ChevronRightIcon,
+  InboxIcon,
+  PlusIcon,
+  SettingsIcon,
+  UsersIcon,
+} from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
@@ -9,6 +16,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -32,7 +40,8 @@ export default function DashboardPage() {
   const { t } = useLingui();
 
   const { user, organisations } = useSession();
-
+  // const { user, organisations } = useSession();
+  const isUserAdmin = isAdmin(user);
   // Todo: Sort by recent access (TBD by cookies)
   // Teams, flattened with the organisation data still attached.
   const teams = useMemo(() => {
@@ -73,12 +82,13 @@ export default function DashboardPage() {
                 <Trans>Create an organisation to get started.</Trans>
               </p>
             </div>
-
-            <Button asChild className="mt-4" variant="outline">
-              <Link to="/settings/organisations?action=add-organisation">
-                <Trans>Create organisation</Trans>
-              </Link>
-            </Button>
+            {isUserAdmin && (
+              <Button asChild className="mt-4" variant="outline">
+                <Link to="/settings/organisations?action=add-organisation">
+                  <Trans>Create organisation</Trans>
+                </Link>
+              </Button>
+            )}
           </div>
         )}
 
@@ -94,10 +104,12 @@ export default function DashboardPage() {
               </div>
 
               {/* Right hand side action if required. */}
-              {/* <Button variant="outline" size="sm" className="gap-1">
-                <PlusIcon className="h-4 w-4" />
-                <Trans>New</Trans>
-              </Button> */}
+              {isUserAdmin && (
+                <Button variant="outline" size="sm" className="gap-1">
+                  <PlusIcon className="h-4 w-4" />
+                  <Trans>New</Trans>
+                </Button>
+              )}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -170,12 +182,14 @@ export default function DashboardPage() {
                   <Trans>Teams</Trans>
                 </h2>
               </div>
-              {/* <Button variant="ghost" size="sm" asChild>
-              <Link to="/" className="gap-1">
-                <Trans>View all</Trans>
-                <ChevronRightIcon className="h-4 w-4" />
-              </Link>
-            </Button> */}
+              {isUserAdmin && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/" className="gap-1">
+                    <Trans>View all</Trans>
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
             </div>
 
             <ScrollArea className="w-full whitespace-nowrap pb-4">
@@ -245,14 +259,16 @@ export default function DashboardPage() {
                 <Trans>Personal Inbox</Trans>
               </h2>
             </div>
-            {/* <Button variant="ghost" size="sm" asChild>
-              <Link to="/inbox" className="gap-1">
-                <span>
-                  <Trans>View all</Trans>
-                </span>
-                <ChevronRightIcon className="h-4 w-4" />
-              </Link>
-            </Button> */}
+            {isUserAdmin && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/inbox" className="gap-1">
+                  <span>
+                    <Trans>View all</Trans>
+                  </span>
+                  <ChevronRightIcon className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
           </div>
 
           <InboxTable />

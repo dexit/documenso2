@@ -12,8 +12,10 @@ import {
 import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { canExecuteTeamAction, formatTeamUrl } from '@documenso/lib/utils/teams';
 import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
@@ -33,7 +35,8 @@ import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
 
 export default function OrganisationSettingsTeamsPage() {
   const { t, i18n } = useLingui();
-
+  const { user, organisations } = useSession();
+  const isUserAdmin = isAdmin(user);
   const organisation = useCurrentOrganisation();
 
   // No teams view.
@@ -118,10 +121,11 @@ export default function OrganisationSettingsTeamsPage() {
             <Trans>Select a team to view its dashboard</Trans>
           </p>
         </div>
-
-        <Button asChild>
-          <Link to={`/o/${organisation.url}/settings`}>Manage Organisation</Link>
-        </Button>
+        {isUserAdmin && (
+          <Button asChild>
+            <Link to={`/o/${organisation.url}/settings`}>Manage Organisation</Link>
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -153,8 +153,8 @@ export const DocumentShareButton = ({
 
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
-            I just {token ? 'started' : 'signed up to'} a coure with{' '}
-            <span className="font-medium text-blue-400">@patwhaygroup</span>
+            I just {token ? 'started' : 'signed up to'} a course with{' '}
+            <span className="font-medium text-blue-400">@pathwaygroup</span>
             !
             <span className="mt-2 block" />
             <span

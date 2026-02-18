@@ -108,7 +108,7 @@ export const DocumentShareButton = ({
 
     window.open(
       generateTwitterIntent(
-        `I just ${token ? 'started' : 'signed up to'} a course with @patwhaygroup.`,
+        `I just ${token ? 'started' : 'signed up to'} a course with @pathwaygroup.`,
         `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`,
       ),
       '_blank',

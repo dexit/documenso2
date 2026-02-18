@@ -1,8 +1,13 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
+import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateEnvelopeRequestSchema,
@@ -31,6 +36,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       folderId,
       meta,
       attachments,
+      delegatedDocumentOwner,
     } = payload;
 
     ctx.logger.info({
@@ -58,14 +64,42 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    // For each file, stream to s3 and create the document data.
+    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message: 'You cannot upload non-PDF files',
+        statusCode: 400,
+      });
+    }
+
+    // For each file: normalize, extract & clean placeholders, then upload.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        let pdf = Buffer.from(await file.arrayBuffer());
+
+        if (formValues) {
+          // eslint-disable-next-line require-atomic-updates
+          pdf = await insertFormValuesInPdf({
+            pdf,
+            formValues,
+          });
+        }
+
+        const normalized = await normalizePdf(pdf, {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
+
+        const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+
+        const { id: documentDataId } = await putPdfFileServerSide({
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(cleanedPdf),
+        });
 
         return {
           title: file.name,
           documentDataId,
+          placeholders,
         };
       }),
     );
@@ -122,6 +156,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         recipients: recipientsToCreate,
         folderId,
         envelopeItems,
+        delegatedDocumentOwner,
       },
       attachments,
       meta,

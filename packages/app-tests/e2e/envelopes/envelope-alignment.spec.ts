@@ -1,46 +1,30 @@
-// sort-imports-ignore
-
-// ---- PATCH pdfjs-dist's canvas require BEFORE importing it ----
-import Module from 'module';
-import { Canvas, Image } from 'skia-canvas';
-
-// Intercept require('canvas') and return skia-canvas equivalents
-const originalRequire = Module.prototype.require;
-Module.prototype.require = function (path: string) {
-  if (path === 'canvas') {
-    return {
-      createCanvas: (width: number, height: number) => new Canvas(width, height),
-      Image, // needed by pdfjs-dist
-    };
-  }
-  // eslint-disable-next-line prefer-rest-params, @typescript-eslint/consistent-type-assertions
-  return originalRequire.apply(this, arguments as unknown as [string]);
-};
-
-import pixelMatch from 'pixelmatch';
-import { PNG } from 'pngjs';
+import { createCanvas } from '@napi-rs/canvas';
 import type { TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import pixelMatch from 'pixelmatch';
+import { PNG } from 'pngjs';
+
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { apiSignin } from '../fixtures/authentication';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
+import { isBase64Image } from '../../../lib/constants/signatures';
+import { createApiToken } from '../../../lib/server-only/public-api/create-api-token';
+import { RecipientRole } from '../../../prisma/generated/types';
 import type {
   TCreateEnvelopePayload,
   TCreateEnvelopeResponse,
 } from '../../../trpc/server/envelope-router/create-envelope.types';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
-import { createApiToken } from '../../../lib/server-only/public-api/create-api-token';
-import { RecipientRole } from '../../../prisma/generated/types';
-import { FIELD_META_TEST_FIELDS } from '../../constants/field-meta-pdf';
-import { ALIGNMENT_TEST_FIELDS } from '../../constants/field-alignment-pdf';
 import type { TDistributeEnvelopeRequest } from '../../../trpc/server/envelope-router/distribute-envelope.types';
-import { isBase64Image } from '../../../lib/constants/signatures';
+import { ALIGNMENT_TEST_FIELDS } from '../../constants/field-alignment-pdf';
+import { FIELD_META_TEST_FIELDS } from '../../constants/field-meta-pdf';
+import { apiSignin } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2`;
@@ -314,8 +298,15 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
  *
  * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
  */
-test.skip('download envelope images', async ({ page }) => {
+test.skip('download envelope images', async ({ page, request }) => {
   const { user, team } = await seedUser();
+
+  const { token: apiToken } = await createApiToken({
+    userId: user.id,
+    teamId: team.id,
+    tokenName: 'test',
+    expiresIn: null,
+  });
 
   const envelope = await seedAlignmentTestDocument({
     userId: user.id,
@@ -323,8 +314,17 @@ test.skip('download envelope images', async ({ page }) => {
     recipientName: user.name || '',
     recipientEmail: user.email,
     insertFields: true,
-    status: DocumentStatus.PENDING,
+    status: DocumentStatus.DRAFT,
   });
+
+  const distributeEnvelopeRequest = await request.post(`${baseUrl}/envelope/distribute`, {
+    headers: { Authorization: `Bearer ${apiToken}` },
+    data: {
+      envelopeId: envelope.id,
+    } satisfies TDistributeEnvelopeRequest,
+  });
+
+  expect(distributeEnvelopeRequest.ok()).toBeTruthy();
 
   const token = envelope.recipients[0].token;
 
@@ -406,15 +406,20 @@ async function renderPdfToImage(pdfBytes: Uint8Array) {
 
       const viewport = page.getViewport({ scale });
 
-      const virtualCanvas = new Canvas(viewport.width, viewport.height);
-      const context = virtualCanvas.getContext('2d');
-      context.imageSmoothingEnabled = false;
+      const canvas = createCanvas(viewport.width, viewport.height);
+      const canvasContext = canvas.getContext('2d');
+      canvasContext.imageSmoothingEnabled = false;
 
-      // @ts-expect-error skia-canvas context satisfies runtime requirements for pdfjs
-      await page.render({ canvasContext: context, viewport }).promise;
+      await page.render({
+        // @ts-expect-error @napi-rs/canvas satisfies runtime requirements for pdfjs
+        canvas,
+        // @ts-expect-error @napi-rs/canvas satisfies runtime requirements for pdfjs
+        canvasContext,
+        viewport,
+      }).promise;
 
       return {
-        image: await virtualCanvas.toBuffer('png'),
+        image: await canvas.encode('png'),
 
         // Rounded down because the certificate page somehow gives dimensions with decimals
         width: Math.floor(viewport.width),

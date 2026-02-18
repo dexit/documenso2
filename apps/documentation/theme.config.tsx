@@ -4,7 +4,7 @@ import { useConfig } from 'nextra-theme-docs';
 const themeConfig: DocsThemeConfig = {
   logo: <span>PathwayL.ink</span>,
   head: function useHead() {
-    const config = useConfig<{ title?: string; description?: string }>();
+    const config = useConfig();
 
     const title = `${config.frontMatter.title} | PG eSign Docs` || 'PG eSign';
     const description = config.frontMatter.description || 'PG eSign documentation';
@@ -12,6 +12,7 @@ const themeConfig: DocsThemeConfig = {
     return (
       <>
         <meta httpEquiv="Content-Language" content="en" />
+        <title>{title}</title>
         <meta name="title" content={title} />
         <meta name="og:title" content={title} />
         <meta name="description" content={description} />
@@ -46,7 +47,7 @@ const themeConfig: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
   footer: {
-    text: (
+    content: (
       <span>
         {new Date().getFullYear()} ©{' '}
         <a href="https://pathwayl.ink" target="_blank">
@@ -62,6 +63,9 @@ const themeConfig: DocsThemeConfig = {
     return {
       titleTemplate: '%s | PG eSign Docs',
     };
+  color: {
+    hue: 100,
+    saturation: 48.47,
   },
 };
 

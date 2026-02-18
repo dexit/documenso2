@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -57,6 +57,7 @@ export function AssistantConfirmationDialog({
   allowDictateNextSigner = false,
   defaultNextSigner,
 }: ConfirmationDialogProps) {
+  const { t } = useLingui();
   const [isEditingNextSigner, setIsEditingNextSigner] = useState(false);
 
   const form = useForm<TNextSignerFormSchema>({
@@ -115,9 +116,11 @@ export function AssistantConfirmationDialog({
                     {!isEditingNextSigner && (
                       <div>
                         <p className="text-muted-foreground text-sm">
-                          The next recipient to sign this document will be{' '}
-                          <span className="font-semibold">{form.watch('name')}</span> (
-                          <span className="font-semibold">{form.watch('email')}</span>).
+                          <Trans>
+                            The next recipient to sign this document will be{' '}
+                            <span className="font-semibold">{form.watch('name')}</span> (
+                            <span className="font-semibold">{form.watch('email')}</span>).
+                          </Trans>
                         </p>
 
                         <Button
@@ -146,7 +149,7 @@ export function AssistantConfirmationDialog({
                                 <Input
                                   {...field}
                                   className="mt-2"
-                                  placeholder="Enter the next signer's name"
+                                  placeholder={t`Enter the next signer's name`}
                                 />
                               </FormControl>
 
@@ -168,7 +171,7 @@ export function AssistantConfirmationDialog({
                                   {...field}
                                   type="email"
                                   className="mt-2"
-                                  placeholder="Enter the next signer's email"
+                                  placeholder={t`Enter the next signer's email`}
                                 />
                               </FormControl>
                               <FormMessage />

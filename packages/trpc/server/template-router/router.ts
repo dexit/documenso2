@@ -28,8 +28,9 @@ import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { getTemplatesByIdsRoute } from './get-templates-by-ids';
 import {
   ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -155,6 +156,11 @@ export const templateRouter = router({
     }),
 
   /**
+   * @public
+   */
+  getMany: getTemplatesByIdsRoute,
+
+  /**
    * Wait until RR7 so we can passthrough documents.
    *
    * @private
@@ -177,9 +183,23 @@ export const templateRouter = router({
 
       const { payload, file } = input;
 
-      const { title, folderId } = payload;
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
+        meta,
+        attachments,
+      } = payload;
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
+      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file, {
+        flattenForm: false,
+      });
 
       ctx.logger.info({
         input: {
@@ -194,13 +214,22 @@ export const templateRouter = router({
         data: {
           type: EnvelopeType.TEMPLATE,
           title,
-          folderId,
           envelopeItems: [
             {
               documentDataId: templateDocumentDataId,
             },
           ],
+          folderId,
+          externalId: externalId ?? undefined,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          templateType: type,
+          publicTitle,
+          publicDescription,
         },
+        meta,
+        attachments,
         requestMetadata: ctx.metadata,
       });
 
@@ -436,8 +465,12 @@ export const templateRouter = router({
         recipients,
         distributeDocument,
         customDocumentDataId,
-        prefillFields,
         folderId,
+        prefillFields,
+        externalId,
+        override,
+        attachments,
+        formValues,
       } = input;
 
       ctx.logger.info({
@@ -474,6 +507,10 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
+        externalId,
+        override,
+        attachments,
+        formValues,
       });
 
       if (distributeDocument) {

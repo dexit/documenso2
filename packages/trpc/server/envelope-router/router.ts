@@ -3,11 +3,14 @@ import { createAttachmentRoute } from './attachment/create-attachment';
 import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
+import { bulkDeleteEnvelopesRoute } from './bulk-delete-envelopes';
+import { bulkMoveEnvelopesRoute } from './bulk-move-envelopes';
 import { createEnvelopeRoute } from './create-envelope';
 import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
 import { deleteEnvelopeItemRoute } from './delete-envelope-item';
 import { distributeEnvelopeRoute } from './distribute-envelope';
+import { downloadEnvelopeItemRoute } from './download-envelope-item';
 import { duplicateEnvelopeRoute } from './duplicate-envelope';
 import { createEnvelopeFieldsRoute } from './envelope-fields/create-envelope-fields';
 import { deleteEnvelopeFieldRoute } from './envelope-fields/delete-envelope-field';
@@ -17,13 +20,17 @@ import { createEnvelopeRecipientsRoute } from './envelope-recipients/create-enve
 import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envelope-recipient';
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
 import { updateEnvelopeRecipientsRoute } from './envelope-recipients/update-envelope-recipients';
+import { findEnvelopeAuditLogsRoute } from './find-envelope-audit-logs';
+import { findEnvelopesRoute } from './find-envelopes';
 import { getEnvelopeRoute } from './get-envelope';
 import { getEnvelopeItemsRoute } from './get-envelope-items';
 import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
+import { getEnvelopesByIdsRoute } from './get-envelopes-by-ids';
 import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { setEnvelopeFieldsRoute } from './set-envelope-fields';
 import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
 import { signEnvelopeFieldRoute } from './sign-envelope-field';
+import { signingStatusEnvelopeRoute } from './signing-status-envelope';
 import { updateEnvelopeRoute } from './update-envelope';
 import { updateEnvelopeItemsRoute } from './update-envelope-items';
 import { useEnvelopeRoute } from './use-envelope';
@@ -46,6 +53,7 @@ export const envelopeRouter = router({
     createMany: createEnvelopeItemsRoute,
     updateMany: updateEnvelopeItemsRoute,
     delete: deleteEnvelopeItemRoute,
+    download: downloadEnvelopeItemRoute,
   },
   recipient: {
     get: getEnvelopeRecipientRoute,
@@ -62,7 +70,16 @@ export const envelopeRouter = router({
     set: setEnvelopeFieldsRoute,
     sign: signEnvelopeFieldRoute,
   },
+  find: findEnvelopesRoute,
+  auditLog: {
+    find: findEnvelopeAuditLogsRoute,
+  },
+  bulk: {
+    move: bulkMoveEnvelopesRoute,
+    delete: bulkDeleteEnvelopesRoute,
+  },
   get: getEnvelopeRoute,
+  getMany: getEnvelopesByIdsRoute,
   create: createEnvelopeRoute,
   use: useEnvelopeRoute,
   update: updateEnvelopeRoute,
@@ -70,4 +87,5 @@ export const envelopeRouter = router({
   duplicate: duplicateEnvelopeRoute,
   distribute: distributeEnvelopeRoute,
   redistribute: redistributeEnvelopeRoute,
+  signingStatus: signingStatusEnvelopeRoute,
 });

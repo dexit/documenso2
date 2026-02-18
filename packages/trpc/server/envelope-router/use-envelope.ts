@@ -6,6 +6,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -26,13 +27,14 @@ export const useEnvelopeRoute = authenticatedProcedure
     const {
       envelopeId,
       externalId,
-      recipients,
+      recipients = [],
       distributeDocument,
       customDocumentData = [],
       folderId,
       prefillFields,
       override,
       attachments,
+      formValues,
     } = payload;
 
     ctx.logger.info({
@@ -78,7 +80,10 @@ export const useEnvelopeRoute = authenticatedProcedure
     // Process uploaded files and create document data for them
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        // We disable flattening here since `createDocumentFromTemplate` will handle it.
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
+          flattenForm: false,
+        });
 
         return {
           name: file.name,
@@ -145,6 +150,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       prefillFields,
       override,
       attachments,
+      formValues,
     });
 
     // Distribute document if requested
@@ -166,5 +172,14 @@ export const useEnvelopeRoute = authenticatedProcedure
 
     return {
       id: createdEnvelope.id,
+      recipients: createdEnvelope.recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+        token: recipient.token,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        signingUrl: formatSigningLink(recipient.token),
+      })),
     };
   });

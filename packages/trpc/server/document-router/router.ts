@@ -5,7 +5,6 @@ import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
 import { createDocumentRoute } from './create-document';
-import { createDocumentFormDataRoute } from './create-document-formdata';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
@@ -20,6 +19,7 @@ import { findDocumentsInternalRoute } from './find-documents-internal';
 import { findInboxRoute } from './find-inbox';
 import { getDocumentRoute } from './get-document';
 import { getDocumentByTokenRoute } from './get-document-by-token';
+import { getDocumentsByIdsRoute } from './get-documents-by-ids';
 import { getInboxCountRoute } from './get-inbox-count';
 import { redistributeDocumentRoute } from './redistribute-document';
 import { searchDocumentRoute } from './search-document';
@@ -28,6 +28,7 @@ import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
   get: getDocumentRoute,
+  getMany: getDocumentsByIdsRoute,
   find: findDocumentsRoute,
   create: createDocumentRoute,
   update: updateDocumentRoute,
@@ -39,11 +40,11 @@ export const documentRouter = router({
   search: searchDocumentRoute,
   share: shareDocumentRoute,
 
-  // Temporary v2 beta routes to be removed once V2 is fully released.
-  downloadBeta: downloadDocumentBetaRoute,
   download: downloadDocumentRoute,
+
+  // Deprecated endpoints which need to be removed in the future.
+  downloadBeta: downloadDocumentBetaRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
-  createDocumentFormData: createDocumentFormDataRoute,
 
   // Internal document routes for custom frontend requests.
   getDocumentByToken: getDocumentByTokenRoute,

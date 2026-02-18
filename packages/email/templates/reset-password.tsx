@@ -75,6 +75,7 @@ export const ResetPasswordTemplate = ({
                   <Link className="text-documenso-700 font-normal" href="mailto:info@pathwayl.ink">
                     contact us.
                   </Link>
+                  .
                 </Trans>
               </Text>
             </Section>

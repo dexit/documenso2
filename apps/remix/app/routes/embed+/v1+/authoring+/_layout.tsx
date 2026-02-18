@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { Outlet, useLoaderData } from 'react-router';
 
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -36,14 +37,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 
   return {
-    hasValidToken: !!result,
     token,
+    hasValidToken: !!result,
     allowEmbedAuthoringWhiteLabel,
   };
 };
 
 export default function AuthoringLayout() {
-  const { hasValidToken, token, allowEmbedAuthoringWhiteLabel } = useLoaderData<typeof loader>();
+  const { token, hasValidToken, allowEmbedAuthoringWhiteLabel } = useLoaderData<typeof loader>();
 
   useLayoutEffect(() => {
     try {
@@ -75,7 +76,11 @@ export default function AuthoringLayout() {
   }, []);
 
   if (!hasValidToken) {
-    return <div>Invalid embedding presign token provided</div>;
+    return (
+      <div>
+        <Trans>Invalid embedding presign token provided</Trans>
+      </div>
+    );
   }
 
   return (

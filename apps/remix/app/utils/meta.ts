@@ -2,11 +2,10 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 export const appMetaTags = (title?: string) => {
   const description =
-    'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.';
-
+    'Pathway Group - Document eSign is a secure and easy-to-use platform for signing documents electronically. Sign contracts, agreements, and more from anywhere, anytime.';
   return [
     {
-      title: title ? `${title} - Documenso` : 'Documenso',
+      title: title ? `${title} - PG eSign` : 'Pathway Group - Document eSign Platform',
     },
     {
       name: 'description',
@@ -15,11 +14,11 @@ export const appMetaTags = (title?: string) => {
     {
       name: 'keywords',
       content:
-        'Documenso, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates',
+        'Pathway Group - Document eSign, Pathway Group, eSign, eSignature, Document Signing, Digital Signature, Online Signature, Electronic Signature, Sign Documents Online, Secure Document Signing, Legal Document Signing, Contract Signing, PDF Signing, Document Management, Workflow Automation, Remote Signing, Cloud-based eSignatures',
     },
     {
       name: 'author',
-      content: 'Documenso, Inc.',
+      content: 'Pathway First Limited',
     },
     {
       name: 'robots',
@@ -27,7 +26,7 @@ export const appMetaTags = (title?: string) => {
     },
     {
       property: 'og:title',
-      content: 'Documenso - The Open Source DocuSign Alternative',
+      content: 'Pathway Group - Document eSign Platform',
     },
     {
       property: 'og:description',
@@ -47,7 +46,7 @@ export const appMetaTags = (title?: string) => {
     },
     {
       name: 'twitter:site',
-      content: '@documenso',
+      content: '@pathwaygroup',
     },
     {
       name: 'twitter:description',

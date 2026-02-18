@@ -5,7 +5,6 @@ import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -16,6 +15,7 @@ import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
+import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -24,7 +24,6 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
-import { ClaimAccount } from '~/components/general/claim-account';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 
 import type { Route } from './+types/complete';
@@ -164,13 +163,13 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             </span>
           </Badge>
 
-          {/* Card with recipient */}
+          {/* Card with recipient
           <SigningCard3D
             name={recipientName}
             signature={signatures.at(0)}
             signingCelebrationImage={signingCelebration}
           />
-
+ */}
           <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
             {recipient.role === RecipientRole.SIGNER && <Trans>Document Signed</Trans>}
             {recipient.role === RecipientRole.VIEWER && <Trans>Document Viewed</Trans>}
@@ -243,13 +242,15 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </p>
             ))}
 
-          <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
+          <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
+            {/*    <DocumentShareButton documentId={document.id} token={recipient.token} />  */}
+        {/*     <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
             <DocumentShareButton
               documentId={document.id}
               token={recipient.token}
               className="w-full max-w-none md:flex-1"
             />
-
+*/}
             {isDocumentCompleted(document) && (
               <EnvelopeDownloadDialog
                 envelopeId={document.envelopeId}
@@ -276,6 +277,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
         </div>
 
         <div className="flex flex-col items-center">
+          {/* Claim Account
           {canSignUp && (
             <div className="flex max-w-xl flex-col items-center justify-center p-4 md:p-12">
               <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
@@ -290,6 +292,12 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
               <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
             </div>
+          )}
+          */}
+          {user && (
+            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-2">
+              <Trans>Go Back Home</Trans>
+            </Link>
           )}
         </div>
       </div>

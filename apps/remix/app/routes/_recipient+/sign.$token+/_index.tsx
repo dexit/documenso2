@@ -24,6 +24,7 @@ import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settin
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
@@ -138,6 +139,10 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     throw redirect(`/sign/${token}/rejected`);
   }
 
+  if (isRecipientExpired(recipient)) {
+    throw redirect(`/sign/${token}/expired`);
+  }
+
   if (
     document.status === DocumentStatus.COMPLETED ||
     recipient.signingStatus === SigningStatus.SIGNED
@@ -199,7 +204,8 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     return envelopeForSigning;
   }
 
-  const { envelope, recipient, isCompleted, isRejected, isRecipientsTurn } = envelopeForSigning;
+  const { envelope, recipient, isCompleted, isRejected, isExpired, isRecipientsTurn } =
+    envelopeForSigning;
 
   if (!isRecipientsTurn) {
     throw redirect(`/sign/${token}/waiting`);
@@ -231,12 +237,6 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     } as const;
   }
 
-  await viewedDocument({
-    token,
-    requestMetadata,
-    recipientAccessAuth: derivedRecipientAccessAuth,
-  }).catch(() => null);
-
   if (isRejected) {
     throw redirect(`/sign/${token}/rejected`);
   }
@@ -244,6 +244,16 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
   if (isCompleted) {
     throw redirect(envelope.documentMeta.redirectUrl || `/sign/${token}/complete`);
   }
+
+  if (isExpired) {
+    throw redirect(`/sign/${token}/expired`);
+  }
+
+  await viewedDocument({
+    token,
+    requestMetadata,
+    recipientAccessAuth: derivedRecipientAccessAuth,
+  }).catch(() => null);
 
   return {
     isDocumentAccessValid: true,

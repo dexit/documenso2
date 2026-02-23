@@ -8,6 +8,9 @@ import {
   putFileServerSide,
   putNormalizedPdfFileServerSide,
 } from '@documenso/lib/universal/upload/put-file.server';
+import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -65,7 +68,15 @@ export const createEnvelopeRoute = authenticatedProcedure
         statusCode: 400,
       });
     }
-
+/*
+    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message: 'You cannot upload non-PDF files',
+        statusCode: 400,
+      });
+    }
+*/
+    // For each file: normalize, extract & clean placeholders, then upload.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
         const { pdfBuffer, originalBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
@@ -100,10 +111,23 @@ export const createEnvelopeRoute = authenticatedProcedure
           originalMimeType,
           flattenForm: type !== EnvelopeType.TEMPLATE,
         });
+        /*
+        const normalized = await normalizePdf(pdf, {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
 
+        const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+
+        const { id: documentDataId } = await putPdfFileServerSide({
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(cleanedPdf),
+        });
+*/
         return {
           title: file.name,
           documentDataId,
+          placeholders,
         };
       }),
     );

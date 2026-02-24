@@ -194,7 +194,7 @@ test.describe('API V2 Envelopes', () => {
           distributionMethod: DocumentDistributionMethod.NONE,
           signingOrder: DocumentSigningOrder.SEQUENTIAL,
           allowDictateNextSigner: true,
-          redirectUrl: 'https://documenso.com',
+          redirectUrl: 'https://pathwayl.ink',
           language: 'de',
           typedSignatureEnabled: true,
           uploadSignatureEnabled: false,
@@ -214,7 +214,7 @@ test.describe('API V2 Envelopes', () => {
         attachments: [
           {
             label: 'Test Attachment',
-            data: 'https://documenso.com',
+            data: 'https://pathwayl.ink',
             type: 'link',
           },
         ],

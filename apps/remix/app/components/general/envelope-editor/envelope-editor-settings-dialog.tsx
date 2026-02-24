@@ -712,7 +712,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                       </SelectItem>
                                     ))}
 
-                                    <SelectItem value={'-1'}>Documenso</SelectItem>
+                                    <SelectItem value={'-1'}>PathwayL.ink</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </FormControl>

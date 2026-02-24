@@ -52,18 +52,19 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   return (
     <header
       className={cn(
-        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200',
+        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[60] flex h-auto w-full items-center border-b border-b-transparent backdrop-blur duration-200',
         scrollY > 5 && 'border-b-border',
         className,
       )}
       {...props}
     >
-      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
+      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 p-4 px-4 md:justify-normal md:p-4 md:px-8">
         <Link
           to={getRootHref(params)}
           className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
-          <BrandingLogo className="h-6 w-auto" />
+               <BrandingLogo className="h-20 w-auto" />
+
         </Link>
 
         <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />

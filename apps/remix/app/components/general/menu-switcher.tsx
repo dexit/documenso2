@@ -66,15 +66,17 @@ export const MenuSwitcher = () => {
         align="end"
         forceMount
       >
-        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-          <Link
-            to="/settings/organisations?action=add-organisation"
-            className="flex items-center justify-between"
-          >
-            <Trans>Create Organisation</Trans>
-            <Plus className="ml-2 h-4 w-4" />
-          </Link>
-        </DropdownMenuItem>
+        {isUserAdmin && (
+          <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+            <Link
+              to="/settings/organisations?action=add-organisation"
+              className="flex items-center justify-between"
+            >
+              <Trans>Create Organisation</Trans>
+              <Plus className="ml-2 h-4 w-4" />
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
 
         {isUserAdmin && (

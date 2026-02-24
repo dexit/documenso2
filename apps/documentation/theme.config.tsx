@@ -2,12 +2,12 @@ import type { DocsThemeConfig } from 'nextra-theme-docs';
 import { useConfig } from 'nextra-theme-docs';
 
 const themeConfig: DocsThemeConfig = {
-  logo: <span>Documenso</span>,
+  logo: <span>PathwayL.ink</span>,
   head: function useHead() {
     const config = useConfig();
 
-    const title = `${config.frontMatter.title} | Documenso Docs` || 'Documenso Docs';
-    const description = config.frontMatter.description || 'The official Documenso documentation';
+    const title = `${config.frontMatter.title} | PG eSign Docs` || 'PG eSign';
+    const description = config.frontMatter.description || 'PG eSign documentation';
 
     return (
       <>
@@ -50,13 +50,19 @@ const themeConfig: DocsThemeConfig = {
     content: (
       <span>
         {new Date().getFullYear()} ©{' '}
-        <a href="https://documen.so" target="_blank">
-          Documenso
+        <a href="https://pathwayl.ink" target="_blank">
+          PG eSign - Pathway Group Document eSign Platform
         </a>
         .
       </span>
     ),
   },
+  primaryHue: 100,
+  primarySaturation: 48.47,
+  useNextSeoProps() {
+    return {
+      titleTemplate: '%s | PG eSign Docs',
+    };
   color: {
     hue: 100,
     saturation: 48.47,

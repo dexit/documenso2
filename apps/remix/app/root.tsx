@@ -27,6 +27,11 @@ import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
 
+const { trackPageview } = Plausible({
+  domain: 'pathwayl.ink',
+  trackLocalhost: false,
+});
+
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
 export function meta() {

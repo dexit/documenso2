@@ -108,7 +108,7 @@ export const DocumentShareButton = ({
 
     window.open(
       generateTwitterIntent(
-        `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
+        `I just ${token ? 'started' : 'signed up to'} a course with @pathwaygroup.`,
         `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`,
       ),
       '_blank',
@@ -153,9 +153,9 @@ export const DocumentShareButton = ({
 
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
-            I just {token ? 'signed' : 'sent'} a document in style with{' '}
-            <span className="font-medium text-blue-400">@documenso</span>
-            . Check it out!
+            I just {token ? 'started' : 'signed up to'} a course with{' '}
+            <span className="font-medium text-blue-400">@pathwaygroup</span>
+            !
             <span className="mt-2 block" />
             <span
               className={cn('break-all font-medium text-blue-400', {

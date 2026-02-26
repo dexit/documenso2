@@ -1,12 +1,18 @@
-import { z } from 'zod';
 import { BackgroundJobStatus } from '@prisma/client';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
+import {
+  retryJobMeta,
+  ZRetryJobRequestSchema,
+  ZRetryJobResponseSchema,
+} from './retry-job.types';
 
 export const retryJobRoute = adminProcedure
-  .input(z.object({ id: z.string() }))
+  .meta(retryJobMeta)
+  .input(ZRetryJobRequestSchema)
+  .output(ZRetryJobResponseSchema)
   .mutation(async ({ input }) => {
-    return await prisma.backgroundJob.update({
+    await prisma.backgroundJob.update({
       where: { id: input.id },
       data: {
         status: BackgroundJobStatus.PENDING,
@@ -14,4 +20,6 @@ export const retryJobRoute = adminProcedure
         lastRetriedAt: null,
       },
     });
+
+    return { success: true };
   });

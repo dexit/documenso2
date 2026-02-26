@@ -1,4 +1,3 @@
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -13,13 +12,20 @@ export default function TeamsSettingsPage() {
   const { _ } = useLingui();
   const { user } = useSession();
   const isUserAdmin = isAdmin(user);
+
+  const rootData = useRouteLoaderData('root') as any;
+  const accessControl = rootData?.accessControl;
+  const disablePersonalOrganisations = accessControl?.disablePersonalOrganisations ?? false;
+
+  const showCreateOrganisation = isUserAdmin || !disablePersonalOrganisations;
+
   return (
     <div>
       <SettingsHeader
         title={_(msg`Organisations`)}
         subtitle={_(msg`Manage all organisations you are currently associated with.`)}
       >
-        {isUserAdmin && <OrganisationCreateDialog />}
+        {showCreateOrganisation && <OrganisationCreateDialog />}
       </SettingsHeader>
 
       <UserOrganisationsTable />

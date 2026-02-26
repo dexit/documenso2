@@ -5,7 +5,10 @@ import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { getSiteSetting } from '../site-settings/get-site-setting';
+import { SITE_SETTINGS_ACCESS_CONTROL_ID, type TSiteSettingsAccessControl } from '../site-settings/schemas/access-control';
 import { createPersonalOrganisation } from '../organisation/create-organisation';
+import { generateDatabaseId } from '../../universal/id';
 
 export interface CreateUserOptions {
   name: string;
@@ -37,17 +40,6 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       },
     });
 
-    // Todo: (RR7) Migrate to use this after RR7.
-    // await tx.account.create({
-    //   data: {
-    //     userId: user.id,
-    //     type: 'emailPassword', // Todo: (RR7)
-    //     provider: 'DOCUMENSO', // Todo: (RR7) Enums
-    //     providerAccountId: user.id.toString(),
-    //     password: hashedPassword,
-    //   },
-    // });
-
     return user;
   });
 
@@ -66,6 +58,24 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
  * @returns User
  */
 export const onCreateUserHook = async (user: User) => {
+  const accessControl = await getSiteSetting<TSiteSettingsAccessControl>(
+    SITE_SETTINGS_ACCESS_CONTROL_ID,
+  );
+
+  if (accessControl?.enabled && accessControl.data.disablePersonalOrganisations) {
+    if (accessControl.data.defaultOrganisationId) {
+      await prisma.organisationMember.create({
+        data: {
+          id: generateDatabaseId('member'),
+          userId: user.id,
+          organisationId: accessControl.data.defaultOrganisationId,
+        },
+      });
+    }
+
+    return user;
+  }
+
   await createPersonalOrganisation({ userId: user.id });
 
   return user;

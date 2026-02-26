@@ -54,7 +54,7 @@ export default function OrganisationSettingsTeamsPage() {
         {canExecuteOrganisationAction(
           'MANAGE_ORGANISATION',
           organisation.currentOrganisationRole,
-        ) ? (
+        ) && isUserAdmin ? (
           <>
             <p className="mb-8 max-w-md text-center text-sm text-muted-foreground">
               <Trans>
@@ -100,10 +100,17 @@ export default function OrganisationSettingsTeamsPage() {
           </>
         ) : (
           <p className="mb-8 max-w-md text-center text-sm text-muted-foreground">
-            <Trans>
-              You currently have no access to any teams within this organisation. Please contact
-              your organisation to request access.
-            </Trans>
+            {organisation.teams.length === 0 ? (
+              <Trans>
+                You currently have no teams within this organisation. Please contact your
+                organisation admin to request a team or wait for an invitation.
+              </Trans>
+            ) : (
+              <Trans>
+                You currently have no access to any teams within this organisation. Please contact
+                your organisation to request access.
+              </Trans>
+            )}
           </p>
         )}
       </div>

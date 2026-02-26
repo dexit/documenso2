@@ -11,7 +11,7 @@ import {
   SettingsIcon,
   UsersIcon,
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useRouteLoaderData } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -49,6 +49,13 @@ export const OrgMenuSwitcher = () => {
   const [hoveredOrgId, setHoveredOrgId] = useState<string | null>(null);
 
   const isUserAdmin = isAdmin(user);
+
+  const rootData = useRouteLoaderData('root') as any;
+  const accessControl = rootData?.accessControl;
+  const disablePersonalOrganisations = accessControl?.disablePersonalOrganisations ?? false;
+
+  const showCreateOrganisation = isUserAdmin || !disablePersonalOrganisations;
+  const showCreateTeam = isUserAdmin || !disablePersonalOrganisations;
 
   const isPathOrgUrl = (orgUrl: string) => {
     if (!pathname || !pathname.startsWith(`/o/`)) {
@@ -194,7 +201,7 @@ export const OrgMenuSwitcher = () => {
                   )}
                 </div>
               ))}
-              {isUserAdmin && (
+              {showCreateOrganisation && (
                 <Button variant="ghost" className="w-full justify-start" asChild>
                   <Link to="/settings/organisations?action=add-organisation">
                     <Plus className="mr-2 h-4 w-4" />
@@ -254,7 +261,7 @@ export const OrgMenuSwitcher = () => {
                   </div>
                 )}
 
-                {displayedOrg && isUserAdmin && (
+                {displayedOrg && showCreateTeam && (
                   <Button variant="ghost" className="w-full justify-start" asChild>
                     <Link to={`/o/${displayedOrg.url}/settings/teams?action=add-team`}>
                       <Plus className="mr-2 h-4 w-4" />

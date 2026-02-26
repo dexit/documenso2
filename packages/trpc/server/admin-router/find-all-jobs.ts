@@ -1,14 +1,15 @@
-import { z } from 'zod';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
+import {
+  findAllJobsMeta,
+  ZFindAllJobsRequestSchema,
+  ZFindAllJobsResponseSchema,
+} from './find-all-jobs.types';
 
 export const findAllJobsRoute = adminProcedure
-  .input(
-    z.object({
-      page: z.number().min(1).optional().default(1),
-      perPage: z.number().min(1).max(100).optional().default(10),
-    }),
-  )
+  .meta(findAllJobsMeta)
+  .input(ZFindAllJobsRequestSchema)
+  .output(ZFindAllJobsResponseSchema)
   .query(async ({ input }) => {
     const { page, perPage } = input;
 

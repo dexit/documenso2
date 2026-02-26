@@ -1,22 +1,27 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import {
   CreditCardIcon,
   ExternalLinkIcon,
+  Loader,
   MoreHorizontalIcon,
   SettingsIcon,
+  Trash2,
   UserIcon,
 } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { Badge } from '@documenso/ui/primitives/badge';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
+import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import type { DataTableColumnDef, RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import {
@@ -28,6 +33,7 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type AdminOrganisationsTableOptions = {
   ownerUserId?: number;
@@ -42,10 +48,14 @@ export const AdminOrganisationsTable = ({
   showOwnerColumn = true,
   hidePaginationUntilOverflow,
 }: AdminOrganisationsTableOptions) => {
-  const { t, i18n } = useLingui();
+  const { t, i18n, _ } = useLingui();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
+
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
@@ -57,12 +67,8 @@ export const AdminOrganisationsTable = ({
     memberUserId,
   });
 
-  const onPaginationChange = (page: number, perPage: number) => {
-    updateSearchParams({
-      page,
-      perPage,
-    });
-  };
+  const { mutateAsync: bulkDeleteOrganisations, isPending: isBulkDeleting } =
+    trpc.admin.organisation.bulkDelete.useMutation();
 
   const results = data ?? {
     data: [],
@@ -71,8 +77,64 @@ export const AdminOrganisationsTable = ({
     totalPages: 1,
   };
 
+  const selectedIds = useMemo(() => {
+    return Object.keys(rowSelection)
+      .filter((key) => rowSelection[key])
+      .map((key) => results.data[Number(key)]?.id)
+      .filter((id): id is string => id !== undefined);
+  }, [rowSelection, results.data]);
+
+  const onPaginationChange = (page: number, perPage: number) => {
+    updateSearchParams({
+      page,
+      perPage,
+    });
+  };
+
+  const onBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+
+    if (!confirm(_(msg`Are you sure you want to delete ${selectedIds.length} organisations?`))) {
+      return;
+    }
+
+    try {
+      const result = await bulkDeleteOrganisations({ ids: selectedIds });
+      toast({
+        title: _(msg`Organisations deleted`),
+        description: _(msg`Successfully deleted ${result.deletedCount} organisations.`),
+      });
+      setRowSelection({});
+      navigate('.', { replace: true });
+    } catch (err) {
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`Failed to delete organisations.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const columns = useMemo(() => {
     return [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label={_(msg`Select all`)}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label={_(msg`Select row`)}
+          />
+        ),
+        size: 40,
+      },
       {
         header: t`Organisation`,
         accessorKey: 'name',
@@ -177,10 +239,26 @@ export const AdminOrganisationsTable = ({
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [t, i18n, memberUserId, _]);
 
   return (
-    <div>
+    <div className="relative">
+      {selectedIds.length > 0 && (
+        <div className="mb-4 flex flex-row items-center gap-2 rounded-md bg-muted px-3 py-2 animate-in fade-in slide-in-from-top-1">
+          <span className="text-sm font-medium">
+            <Trans>{selectedIds.length} selected</Trans>
+          </span>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onBulkDelete}
+            loading={isBulkDeleting}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            <Trans>Delete</Trans>
+          </Button>
+        </div>
+      )}
       <DataTable
         columns={columns}
         data={results.data}
@@ -188,6 +266,9 @@ export const AdminOrganisationsTable = ({
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+        enableRowSelection={true}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
         columnVisibility={{
           owner: showOwnerColumn,
           role: memberUserId !== undefined,
@@ -227,6 +308,12 @@ export const AdminOrganisationsTable = ({
           ) : null
         }
       </DataTable>
+
+      {isBulkDeleting && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50">
+          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
+      )}
     </div>
   );
 };

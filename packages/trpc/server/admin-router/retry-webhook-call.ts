@@ -1,10 +1,10 @@
 import { Prisma, WebhookCallStatus } from '@prisma/client';
-import { z } from 'zod';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
+import { ZRetryWebhookCallRequestSchema } from './retry-webhook-call.types';
 
 export const retryWebhookCallRoute = adminProcedure
-  .input(z.object({ webhookCallId: z.string() }))
+  .input(ZRetryWebhookCallRequestSchema)
   .mutation(async ({ input }) => {
     const { webhookCallId } = input;
 

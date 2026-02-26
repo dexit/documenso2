@@ -1,22 +1,36 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/react/macro';
+import { msg, t } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useLoaderData, useSearchParams } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getSiteSetting } from '@documenso/lib/server-only/site-settings/get-site-setting';
+import { SITE_SETTINGS_SUPPORT_ID, type TSiteSettingsSupport } from '@documenso/lib/server-only/site-settings/schemas/support';
 import { Button } from '@documenso/ui/primitives/button';
 
+import type { Route } from './+types/o.$orgUrl.support';
 import { SupportTicketForm } from '~/components/forms/support-ticket-form';
 import { appMetaTags } from '~/utils/meta';
+
+export const loader = async () => {
+  const supportSettings = await getSiteSetting<TSiteSettingsSupport>(SITE_SETTINGS_SUPPORT_ID);
+
+  return {
+    supportSettings: supportSettings?.enabled ? supportSettings : null,
+  };
+};
 
 export function meta() {
   return appMetaTags('Support');
 }
 
 export default function SupportPage() {
+  const { t } = useLingui();
+  const { supportSettings } = useLoaderData<typeof loader>();
   const [showForm, setShowForm] = useState(false);
   const { user } = useSession();
   const organisation = useCurrentOrganisation();
@@ -25,7 +39,7 @@ export default function SupportPage() {
 
   const teamId = searchParams.get('team');
 
-  const subscriptionStatus = organisation.subscription?.status;
+  const subscriptionStatus = organisation?.subscription?.status;
 
   const handleSuccess = () => {
     setShowForm(false);
@@ -91,32 +105,36 @@ export default function SupportPage() {
               </Trans>
             </p>
           </div>
-          {organisation && IS_BILLING_ENABLED() && subscriptionStatus && (
-            <>
-              <div className="rounded-lg border p-4">
-                <h2 className="flex items-center gap-2 text-lg font-bold">
-                  <Link2Icon className="text-muted-foreground h-5 w-5" />
-                  <Trans>Contact us</Trans>
-                </h2>
-                <p className="text-muted-foreground mt-1">
-                  <Trans>We'll get back to you as soon as possible via email.</Trans>
-                </p>
-                <div className="mt-4">
-                  {!showForm ? (
-                    <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
-                      <Trans>Create a support ticket</Trans>
-                    </Button>
-                  ) : (
-                    <SupportTicketForm
-                      organisationId={organisation.id}
-                      teamId={teamId}
-                      onSuccess={handleSuccess}
-                      onClose={handleCloseForm}
-                    />
-                  )}
-                </div>
+
+          {(supportSettings || (organisation && IS_BILLING_ENABLED() && subscriptionStatus)) && (
+            <div className="rounded-lg border p-4">
+              <h2 className="flex items-center gap-2 text-lg font-bold">
+                <Link2Icon className="text-muted-foreground h-5 w-5" />
+                <Trans>{supportSettings?.data.title ?? t`Contact us`}</Trans>
+              </h2>
+              <p className="text-muted-foreground mt-1">
+                <Trans>
+                  {supportSettings?.data.description ??
+                    t`We'll get back to you as soon as possible via email.`}
+                </Trans>
+              </p>
+              <div className="mt-4">
+                {!showForm ? (
+                  <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
+                    <Trans>Create a support ticket</Trans>
+                  </Button>
+                ) : (
+                  <SupportTicketForm
+                    organisationId={organisation.id}
+                    orgUrl={organisation.url}
+                    teamId={teamId}
+                    supportSettings={supportSettings}
+                    onSuccess={handleSuccess}
+                    onClose={handleCloseForm}
+                  />
+                )}
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

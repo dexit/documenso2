@@ -1,16 +1,16 @@
-import { z } from 'zod';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
 import { forget } from '@documenso/lib/utils/remember';
+import {
+  upsertStringReplacementMeta,
+  ZUpsertStringReplacementRequestSchema,
+  ZUpsertStringReplacementResponseSchema,
+} from './upsert-string-replacement.types';
 
 export const upsertStringReplacementRoute = adminProcedure
-  .input(
-    z.object({
-      id: z.string().optional(),
-      original: z.string().min(1),
-      replacement: z.string(),
-    }),
-  )
+  .meta(upsertStringReplacementMeta)
+  .input(ZUpsertStringReplacementRequestSchema)
+  .output(ZUpsertStringReplacementResponseSchema)
   .mutation(async ({ input }) => {
     const { id, original, replacement } = input;
 

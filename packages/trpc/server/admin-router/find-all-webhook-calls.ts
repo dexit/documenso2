@@ -1,14 +1,15 @@
-import { z } from 'zod';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
+import {
+  findAllWebhookCallsMeta,
+  ZFindAllWebhookCallsRequestSchema,
+  ZFindAllWebhookCallsResponseSchema,
+} from './find-all-webhook-calls.types';
 
 export const findAllWebhookCallsRoute = adminProcedure
-  .input(
-    z.object({
-      page: z.number().min(1).optional().default(1),
-      perPage: z.number().min(1).max(100).optional().default(10),
-    }),
-  )
+  .meta(findAllWebhookCallsMeta)
+  .input(ZFindAllWebhookCallsRequestSchema)
+  .output(ZFindAllWebhookCallsResponseSchema)
   .query(async ({ input }) => {
     const { page, perPage } = input;
 

@@ -5,6 +5,8 @@ import { useSearchParams } from 'react-router';
 import { useLocation } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { Input } from '@documenso/ui/primitives/input';
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
@@ -13,6 +15,9 @@ import { OrganisationTeamsTable } from '~/components/tables/organisation-teams-t
 
 export default function OrganisationSettingsTeamsPage() {
   const { t } = useLingui();
+  const { user } = useSession();
+
+  const isUserAdmin = isAdmin(user);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { pathname } = useLocation();
@@ -39,7 +44,7 @@ export default function OrganisationSettingsTeamsPage() {
   return (
     <div>
       <SettingsHeader title={t`Teams`} subtitle={t`Manage the teams in this organisation.`}>
-        <TeamCreateDialog />
+        {isUserAdmin && <TeamCreateDialog />}
       </SettingsHeader>
 
       <Input

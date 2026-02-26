@@ -80,6 +80,8 @@ export function meta() {
  */
 export const shouldRevalidate = () => false;
 
+import { SITE_SETTINGS_ACCESS_CONTROL_ID } from '@documenso/lib/server-only/site-settings/schemas/access-control';
+
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
@@ -129,6 +131,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const analytics = siteSettings.find((s) => s.id === SITE_SETTINGS_ANALYTICS_ID);
   const custom404 = siteSettings.find((s) => s.id === SITE_SETTINGS_404_ID);
+  const accessControl = siteSettings.find((s) => s.id === SITE_SETTINGS_ACCESS_CONTROL_ID);
 
   return data(
     {
@@ -145,6 +148,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       publicEnv: createPublicEnv(),
       analytics: analytics?.enabled ? (analytics.data as any) : null,
       custom404: custom404?.enabled ? (custom404.data as any) : null,
+      accessControl: accessControl?.enabled ? (accessControl.data as any) : null,
       accentColor,
     },
     {

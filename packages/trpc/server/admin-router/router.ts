@@ -1,4 +1,5 @@
 import { router } from '../trpc';
+import { bulkDeleteOrganisationsRoute } from './bulk-delete-organisations';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -12,6 +13,7 @@ import { findAllJobsRoute } from './find-all-jobs';
 import { findAllWebhookCallsRoute } from './find-all-webhook-calls';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
+import { bulkDeleteUsersRoute } from './bulk-delete-users';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailsRoute } from './find-emails';
 import { findStringReplacementsRoute } from './find-string-replacements';
@@ -34,12 +36,25 @@ import { updateSubscriptionClaimRoute } from './update-subscription-claim';
 import { updateUserRoute } from './update-user';
 import { upsertStringReplacementRoute } from './upsert-string-replacement';
 
+import { bulkDeleteDocumentsRoute } from './bulk-delete-documents';
+
+import { bulkDeleteWebhookCallsRoute } from './bulk-delete-webhook-calls';
+
+import { bulkDeleteEmailsRoute } from './bulk-delete-emails';
+
+import { bulkDeleteJobsRoute } from './bulk-delete-jobs';
+
+import { bulkDeleteClaimsRoute } from './bulk-delete-claims';
+
+import { bulkDeleteStringReplacementsRoute } from './bulk-delete-string-replacements';
+
 export const adminRouter = router({
   organisation: {
     find: findAdminOrganisationsRoute,
     get: getAdminOrganisationRoute,
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
+    bulkDelete: bulkDeleteOrganisationsRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
@@ -50,6 +65,7 @@ export const adminRouter = router({
     create: createSubscriptionClaimRoute,
     update: updateSubscriptionClaimRoute,
     delete: deleteSubscriptionClaimRoute,
+    bulkDelete: bulkDeleteClaimsRoute,
   },
   stripe: {
     createCustomer: createStripeCustomerRoute,
@@ -61,6 +77,7 @@ export const adminRouter = router({
     get: getUserRoute,
     update: updateUserRoute,
     delete: deleteUserRoute,
+    bulkDelete: bulkDeleteUsersRoute,
     enable: enableUserRoute,
     disable: disableUserRoute,
     resetTwoFactor: resetTwoFactorRoute,
@@ -69,6 +86,7 @@ export const adminRouter = router({
   document: {
     find: findDocumentsRoute,
     delete: deleteDocumentRoute,
+    bulkDelete: bulkDeleteDocumentsRoute,
     reseal: resealDocumentRoute,
     findJobs: findDocumentJobsRoute,
     findAuditLogs: findDocumentAuditLogsRoute,
@@ -80,17 +98,21 @@ export const adminRouter = router({
   email: {
     find: findEmailsRoute,
     retry: retryEmailRoute,
+    bulkDelete: bulkDeleteEmailsRoute,
   },
   webhook: {
     findAllCalls: findAllWebhookCallsRoute,
     retryCall: retryWebhookCallRoute,
+    bulkDeleteCalls: bulkDeleteWebhookCallsRoute,
   },
   job: {
     findAll: findAllJobsRoute,
     retry: retryJobRoute,
+    bulkDelete: bulkDeleteJobsRoute,
   },
   stringReplacement: {
     find: findStringReplacementsRoute,
     upsert: upsertStringReplacementRoute,
+    bulkDelete: bulkDeleteStringReplacementsRoute,
   },
 });

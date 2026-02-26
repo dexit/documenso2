@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { ChevronsUpDown, Plus } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useRouteLoaderData } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -31,6 +31,11 @@ export const MenuSwitcher = () => {
   const [languageSwitcherOpen, setLanguageSwitcherOpen] = useState(false);
 
   const isUserAdmin = isAdmin(user);
+  const rootData = useRouteLoaderData('root') as any;
+  const accessControl = rootData?.accessControl;
+  const disablePersonalOrganisations = accessControl?.disablePersonalOrganisations ?? false;
+
+  const showCreateOrganisation = isUserAdmin || !disablePersonalOrganisations;
 
   const formatAvatarFallback = (name?: string) => {
     if (name !== undefined) {
@@ -66,7 +71,7 @@ export const MenuSwitcher = () => {
         align="end"
         forceMount
       >
-        {isUserAdmin && (
+        {showCreateOrganisation && (
           <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
             <Link
               to="/settings/organisations?action=add-organisation"

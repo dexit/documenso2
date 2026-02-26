@@ -1,14 +1,15 @@
-import { z } from 'zod';
 import { adminProcedure } from '../trpc';
 import { prisma } from '@documenso/prisma';
+import {
+  findStringReplacementsMeta,
+  ZFindStringReplacementsRequestSchema,
+  ZFindStringReplacementsResponseSchema,
+} from './find-string-replacements.types';
 
 export const findStringReplacementsRoute = adminProcedure
-  .input(
-    z.object({
-      page: z.number().min(1).optional().default(1),
-      perPage: z.number().min(1).max(100).optional().default(10),
-    }),
-  )
+  .meta(findStringReplacementsMeta)
+  .input(ZFindStringReplacementsRequestSchema)
+  .output(ZFindStringReplacementsResponseSchema)
   .query(async ({ input }) => {
     const { page, perPage } = input;
 

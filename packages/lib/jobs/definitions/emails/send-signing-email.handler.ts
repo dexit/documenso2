@@ -10,12 +10,12 @@ import {
   SendStatus,
 } from '@prisma/client';
 
-import { mailer, sendEmail } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -188,45 +188,8 @@ export const run = async ({
 
   if (isRecipientEmailValidForSending(recipient)) {
     await io.runTask('send-signing-email', async () => {
-      const { prisma } = await import('@documenso/prisma');
-
-      const emailRecord = await prisma.email.create({
-        data: {
-          to: recipient.email,
-          subject: renderCustomEmailTemplate(
-            documentMeta?.subject || emailSubject,
-            customEmailTemplate,
-          ),
-          body: '',
-          recipientId: recipient.id,
-          envelopeId: envelope.id,
-          userId: user.id,
-          status: 'PENDING',
-        },
-      });
-
-      const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          emailId: emailRecord.id,
-          globalDesign,
-        }),
-        renderEmailWithI18N(template, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-          emailId: emailRecord.id,
-          globalDesign,
-        }),
-      ]);
-
-      await prisma.email.update({
-        where: { id: emailRecord.id },
-        data: { body: html },
-      });
-
-      await mailer.sendMail({
+      await sendTrackedEmail({
+        template,
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -237,13 +200,11 @@ export const run = async ({
           documentMeta?.subject || emailSubject,
           customEmailTemplate,
         ),
-        html,
-        text,
-      });
-
-      await prisma.email.update({
-        where: { id: emailRecord.id },
-        data: { status: 'SENT' },
+        userId: user.id,
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+        lang: emailLanguage,
+        branding,
       });
     });
   }

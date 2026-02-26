@@ -2,11 +2,11 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
 import { RecipientExpiredTemplate } from '@documenso/email/templates/recipient-expired';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -92,16 +92,8 @@ export const run = async ({
   });
 
   await io.runTask('send-owner-recipient-expired-email', async () => {
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
-
-    await mailer.sendMail({
+    await sendTrackedEmail({
+      template,
       to: {
         name: documentOwner.name || '',
         address: documentOwner.email,
@@ -110,8 +102,10 @@ export const run = async ({
       subject: i18n._(
         msg`Signing window expired for "${recipient.name || recipient.email}" on "${envelope.title}"`,
       ),
-      html,
-      text,
+      userId: documentOwner.id,
+      envelopeId,
+      lang: emailLanguage,
+      branding,
     });
   });
 };

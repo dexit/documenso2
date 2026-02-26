@@ -3,13 +3,13 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
@@ -96,16 +96,8 @@ export const run = async ({
         assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
       });
 
-      const [html, text] = await Promise.all([
-        renderEmailWithI18N(recipientTemplate, { lang: emailLanguage, branding }),
-        renderEmailWithI18N(recipientTemplate, {
-          lang: emailLanguage,
-          branding,
-          plainText: true,
-        }),
-      ]);
-
-      await mailer.sendMail({
+      await sendTrackedEmail({
+        template: recipientTemplate,
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -113,8 +105,10 @@ export const run = async ({
         from: senderEmail,
         replyTo: replyToEmail,
         subject: i18n._(msg`Document "${envelope.title}" - Rejection Confirmed`),
-        html,
-        text,
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+        lang: emailLanguage,
+        branding,
       });
     });
   }
@@ -131,24 +125,18 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(ownerTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(ownerTemplate, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
-
-    await mailer.sendMail({
+    await sendTrackedEmail({
+      template: ownerTemplate,
       to: {
         name: documentOwner.name || '',
         address: documentOwner.email,
       },
       from: DOCUMENSO_INTERNAL_EMAIL, // Purposefully using internal email here.
       subject: i18n._(msg`Document "${envelope.title}" - Rejected by ${recipient.name}`),
-      html,
-      text,
+      userId: documentOwner.id,
+      envelopeId: envelope.id,
+      lang: emailLanguage,
+      branding,
     });
   });
 

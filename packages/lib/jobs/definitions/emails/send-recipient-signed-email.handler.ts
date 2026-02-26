@@ -3,11 +3,11 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
 import { DocumentRecipientSignedEmailTemplate } from '@documenso/email/templates/document-recipient-signed';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -106,24 +106,18 @@ export const run = async ({
   });
 
   await io.runTask('send-recipient-signed-email', async () => {
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
-
-    await mailer.sendMail({
+    await sendTrackedEmail({
+      template,
       to: {
         name: owner.name ?? '',
         address: owner.email,
       },
       from: senderEmail,
       subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
-      html,
-      text,
+      userId: owner.id,
+      envelopeId: envelope.id,
+      lang: emailLanguage,
+      branding,
     });
   });
 };

@@ -41,14 +41,15 @@ const allMessages = async () => {
 type AllI18nInstances = { [K in SupportedLanguages]: I18n };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-export const allI18nInstances = remember('i18n.allI18nInstances', async () => {
-  const loadedMessages = await allMessages();
+export const getAllI18nInstances = async () => {
+  return await remember('i18n.allI18nInstances', async () => {
+    const loadedMessages = await allMessages();
 
-  const { prisma } = await import('@documenso/prisma');
-  const replacements = await prisma.stringReplacement.findMany();
+    const { prisma } = await import('@documenso/prisma');
+    const replacements = await prisma.stringReplacement.findMany();
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return SUPPORTED_LANGUAGE_CODES.reduce((acc, lang) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return SUPPORTED_LANGUAGE_CODES.reduce((acc, lang) => {
     const messages = { ...(loadedMessages[lang] ?? {}) };
 
     if (replacements.length > 0) {
@@ -69,13 +70,14 @@ export const allI18nInstances = remember('i18n.allI18nInstances', async () => {
       messages: { [lang]: messages },
     });
 
-    return { ...acc, [lang]: i18n };
-  }, {}) as AllI18nInstances;
-});
+      return { ...acc, [lang]: i18n };
+    }, {}) as AllI18nInstances;
+  });
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const getI18nInstance = async (lang?: SupportedLanguages | (string & {})) => {
-  const instances = await allI18nInstances;
+  const instances = await getAllI18nInstances();
 
   if (!isValidLanguageCode(lang)) {
     return instances[APP_I18N_OPTIONS.sourceLang];

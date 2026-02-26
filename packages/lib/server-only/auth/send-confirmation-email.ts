@@ -2,7 +2,6 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
 import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
@@ -12,7 +11,7 @@ import {
   DOCUMENSO_INTERNAL_EMAIL,
   USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
 } from '../../constants/email';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { sendTrackedEmail } from '../email/send-tracked-email';
 
 export interface SendConfirmationEmailProps {
   userId: number;
@@ -50,21 +49,16 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     confirmationLink,
   });
 
-  const [html, text] = await Promise.all([
-    renderEmailWithI18N(confirmationTemplate),
-    renderEmailWithI18N(confirmationTemplate, { plainText: true }),
-  ]);
-
   const i18n = await getI18nInstance();
 
-  return mailer.sendMail({
+  return await sendTrackedEmail({
+    template: confirmationTemplate,
     to: {
       address: user.email,
       name: user.name || '',
     },
     from: DOCUMENSO_INTERNAL_EMAIL,
     subject: i18n._(msg`Please confirm your email`),
-    html,
-    text,
+    userId: user.id,
   });
 };

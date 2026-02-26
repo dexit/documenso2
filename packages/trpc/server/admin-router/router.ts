@@ -14,6 +14,7 @@ import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailsRoute } from './find-emails';
+import { deleteStringReplacementRoute } from './delete-string-replacement';
 import { findStringReplacementsRoute } from './find-string-replacements';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUserTeamsRoute } from './find-user-teams';
@@ -92,5 +93,6 @@ export const adminRouter = router({
   stringReplacement: {
     find: findStringReplacementsRoute,
     upsert: upsertStringReplacementRoute,
+    delete: deleteStringReplacementRoute,
   },
 });

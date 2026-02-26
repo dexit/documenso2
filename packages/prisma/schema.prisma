@@ -200,6 +200,13 @@ model Email {
   user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   interactions EmailInteraction[]
+
+  @@index([to])
+  @@index([status])
+  @@index([recipientId])
+  @@index([envelopeId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model EmailInteraction {
@@ -213,6 +220,10 @@ model EmailInteraction {
 
   emailId String
   email   Email  @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model StringReplacement {
@@ -222,6 +233,8 @@ model StringReplacement {
 
   original    String @unique
   replacement String
+
+  @@index([original])
 }
 
 model Webhook {

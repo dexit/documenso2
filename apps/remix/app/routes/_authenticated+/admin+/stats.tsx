@@ -11,9 +11,11 @@ import {
   MailOpen,
   PenTool,
   UserPlus,
+  RotateCcw,
   UserSquare2,
   Users,
 } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
@@ -25,6 +27,7 @@ import {
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { AdminLicenseCard } from '~/components/general/admin-license-card';
 import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
@@ -70,6 +73,7 @@ export async function loader() {
 
 export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
   const { _ } = useLingui();
+  const { revalidate, state } = useRevalidator();
 
   const {
     usersCount,
@@ -84,9 +88,20 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
-        <Trans>Instance Stats</Trans>
-      </h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-4xl font-semibold">
+          <Trans>Instance Stats</Trans>
+        </h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => revalidate()}
+          loading={state === 'loading'}
+        >
+          <RotateCcw className="mr-2 h-4 w-4" />
+          <Trans>Refresh</Trans>
+        </Button>
+      </div>
 
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <CardMetric icon={Users} title={_(msg`Total Users`)} value={usersCount} />

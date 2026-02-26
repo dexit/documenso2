@@ -9,7 +9,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { Plus, Edit2 } from 'lucide-react';
+import { Plus, Edit2, Trash } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -54,13 +54,21 @@ export default function AdminTranslatorPage() {
   const { mutate: upsertReplacement, isPending: isSaving } =
     trpc.admin.stringReplacement.upsert.useMutation({
       onSuccess: () => {
-        toast({ title: t`Replacement saved. Refresh may be needed for all changes to take effect.` });
+        toast({ title: t`Replacement saved.` });
         setIsDialogOpen(false);
         setEditingId(null);
         void refetch();
       },
       onError: () => {
         toast({ title: t`Failed to save replacement`, variant: 'destructive' });
+      },
+    });
+
+  const { mutate: deleteReplacement } =
+    trpc.admin.stringReplacement.delete.useMutation({
+      onSuccess: () => {
+        toast({ title: t`Replacement deleted.` });
+        void refetch();
       },
     });
 
@@ -100,9 +108,23 @@ export default function AdminTranslatorPage() {
       {
         id: 'actions',
         cell: ({ row }: any) => (
-          <Button variant="ghost" size="sm" onClick={() => onEdit(row.original)}>
-            <Edit2 className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-1">
+            <Button variant="ghost" size="sm" onClick={() => onEdit(row.original)}>
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive"
+              onClick={() => {
+                if (confirm(t`Are you sure?`)) {
+                  deleteReplacement({ id: row.original.id });
+                }
+              }}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
         ),
       },
     ],

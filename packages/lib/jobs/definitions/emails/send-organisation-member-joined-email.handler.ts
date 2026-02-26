@@ -2,11 +2,11 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
 import OrganisationJoinEmailTemplate from '@documenso/email/templates/organisation-join';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
@@ -92,27 +92,16 @@ export const run = async ({
           organisationUrl: organisation.url,
         });
 
-        // !: Replace with the actual language of the recipient later
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-          }),
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
-        ]);
-
         const i18n = await getI18nInstance(emailLanguage);
 
-        await mailer.sendMail({
+        await sendTrackedEmail({
+          template: emailContent,
           to: member.user.email,
           from: senderEmail,
           subject: i18n._(msg`A new member has joined your organisation`),
-          html,
-          text,
+          userId: member.user.id,
+          lang: emailLanguage,
+          branding,
         });
       },
     );

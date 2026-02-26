@@ -3,12 +3,12 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { sendTrackedEmail } from '../../../server-only/email/send-tracked-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -93,16 +93,8 @@ export const run = async ({
           cancellationReason: cancellationReason || 'The document has been cancelled.',
         });
 
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
-        ]);
-
-        await mailer.sendMail({
+        await sendTrackedEmail({
+          template,
           to: {
             name: recipient.name,
             address: recipient.email,
@@ -110,8 +102,11 @@ export const run = async ({
           from: senderEmail,
           replyTo: replyToEmail,
           subject: i18n._(msg`Document "${envelope.title}" Cancelled`),
-          html,
-          text,
+          userId: documentOwner.id,
+          recipientId: recipient.id,
+          envelopeId: envelope.id,
+          lang: emailLanguage,
+          branding,
         });
       }),
     );

@@ -3,6 +3,7 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { convertDocxToPdf } from '@documenso/lib/server-only/pdf/convert-docx-to-pdf';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -64,9 +65,14 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+    const ALLOWED_MIME_TYPES = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    if (files.some((file) => !ALLOWED_MIME_TYPES.includes(file.type))) {
       throw new AppError('INVALID_DOCUMENT_FILE', {
-        message: 'You cannot upload non-PDF files',
+        message: 'You can only upload PDF and DOCX files',
         statusCode: 400,
       });
     }
@@ -74,7 +80,13 @@ export const createEnvelopeRoute = authenticatedProcedure
     // For each file: normalize, extract & clean placeholders, then upload.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        let pdf = Buffer.from(await file.arrayBuffer());
+        let pdf: Buffer;
+
+        if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          pdf = await convertDocxToPdf(Buffer.from(await file.arrayBuffer()));
+        } else {
+          pdf = Buffer.from(await file.arrayBuffer());
+        }
 
         if (formValues) {
           // eslint-disable-next-line require-atomic-updates

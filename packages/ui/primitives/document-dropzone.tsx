@@ -57,6 +57,7 @@ export const DocumentDropzone = ({
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     multiple: allowMultiple,
     disabled,
@@ -162,7 +163,7 @@ export const DocumentDropzone = ({
           <p className="text-foreground mt-6 font-medium">{_(heading[type])}</p>
 
           <p className="text-muted-foreground/80 mt-1 text-center text-sm">
-            {_(disabled ? disabledMessage : msg`Drag & drop your PDF here.`)}
+            {_(disabled ? disabledMessage : msg`Drag & drop your PDF or DOCX here.`)}
           </p>
 
           {disabled && IS_BILLING_ENABLED() && (

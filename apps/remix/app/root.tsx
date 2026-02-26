@@ -16,6 +16,9 @@ import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/co
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
+import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
+import { SITE_SETTINGS_404_ID } from '@documenso/lib/server-only/site-settings/schemas/404';
+import { SITE_SETTINGS_ANALYTICS_ID } from '@documenso/lib/server-only/site-settings/schemas/analytics';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
@@ -27,10 +30,42 @@ import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
 
-const { trackPageview } = Plausible({
-  domain: 'pathwayl.ink',
-  trackLocalhost: false,
-});
+const hexToHsl = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return hex;
+
+  let r = parseInt(result[1], 16) / 255;
+  let g = parseInt(result[2], 16) / 255;
+  let b = parseInt(result[3], 16) / 255;
+
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  let h = 0,
+    s,
+    l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+};
+
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -66,6 +101,35 @@ export async function loader({ request }: Route.LoaderArgs) {
     organisations = await getOrganisationSession({ userId: session.user.id });
   }
 
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split('/');
+  let accentColor = null;
+
+  if (organisations) {
+    let currentOrg = null;
+    let currentTeam = null;
+
+    if (pathParts[1] === 'o' && pathParts[2]) {
+      currentOrg = organisations.find((o) => o.url === pathParts[2]);
+    } else if (pathParts[1] === 't' && pathParts[2]) {
+      for (const org of organisations) {
+        const team = org.teams.find((t) => t.url === pathParts[2]);
+        if (team) {
+          currentTeam = team;
+          currentOrg = org;
+          break;
+        }
+      }
+    }
+
+    accentColor = currentTeam?.preferences.accentColor || currentOrg?.preferences.accentColor;
+  }
+
+  const siteSettings = await getSiteSettings();
+
+  const analytics = siteSettings.find((s) => s.id === SITE_SETTINGS_ANALYTICS_ID);
+  const custom404 = siteSettings.find((s) => s.id === SITE_SETTINGS_404_ID);
+
   return data(
     {
       lang,
@@ -79,6 +143,9 @@ export async function loader({ request }: Route.LoaderArgs) {
           }
         : null,
       publicEnv: createPublicEnv(),
+      analytics: analytics?.enabled ? (analytics.data as any) : null,
+      custom404: custom404?.enabled ? (custom404.data as any) : null,
+      accentColor,
     },
     {
       headers: {
@@ -99,15 +166,61 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, disableAnimations, ...data } =
+  const { publicEnv, session, lang, disableAnimations, analytics, accentColor, ...data } =
     useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
+  const accentStyles = accentColor
+    ? {
+        '--primary': accentColor.startsWith('#') ? hexToHsl(accentColor) : accentColor,
+        '--accent': accentColor.startsWith('#') ? hexToHsl(accentColor) : accentColor,
+      } as React.CSSProperties
+    : {};
+
   return (
-    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
+    <html
+      translate="no"
+      lang={lang}
+      data-theme={theme}
+      className={theme ?? ''}
+      style={accentStyles}
+    >
       <head>
         <meta charSet="utf-8" />
+
+        {analytics?.googleAnalyticsId && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${analytics.googleAnalyticsId}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${analytics.googleAnalyticsId}');
+                `,
+              }}
+            />
+          </>
+        )}
+
+        {analytics?.googleTagManagerId && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${analytics.googleTagManagerId}');
+              `,
+            }}
+          />
+        )}
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -131,6 +244,16 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script>0</script>
       </head>
       <body>
+        {analytics?.googleTagManagerId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${analytics.googleTagManagerId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        )}
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
         {/* {licenseStatus === '?' && (
           <div className="bg-destructive text-destructive-foreground">
@@ -171,11 +294,14 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const data = useLoaderData<typeof loader>() as any;
+  const custom404 = data?.custom404;
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   if (errorCode !== 404) {
     console.error('[RootErrorBoundary]', error);
   }
 
-  return <GenericErrorLayout errorCode={errorCode} />;
+  return <GenericErrorLayout errorCode={errorCode} custom404={custom404} />;
 }

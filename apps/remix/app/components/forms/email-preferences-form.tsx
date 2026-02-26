@@ -13,6 +13,7 @@ import {
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
 import { Button } from '@documenso/ui/primitives/button';
+import { RichTextEditor } from '@documenso/ui/primitives/rich-text-editor';
 import {
   Form,
   FormControl,
@@ -36,13 +37,14 @@ const ZEmailPreferencesFormSchema = z.object({
   emailReplyTo: z.string().email().nullable(),
   // emailReplyToName: z.string(),
   emailDocumentSettings: ZDocumentEmailSettingsSchema.nullable(),
+  emailMessage: z.string().nullable(),
 });
 
 export type TEmailPreferencesFormSchema = z.infer<typeof ZEmailPreferencesFormSchema>;
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'emailId' | 'emailReplyTo' | 'emailDocumentSettings'
+  'emailId' | 'emailReplyTo' | 'emailDocumentSettings' | 'emailMessage'
 >;
 
 export type EmailPreferencesFormProps = {
@@ -64,6 +66,7 @@ export const EmailPreferencesForm = ({
       emailReplyTo: settings.emailReplyTo,
       // emailReplyToName: settings.emailReplyToName,
       emailDocumentSettings: settings.emailDocumentSettings,
+      emailMessage: settings.emailMessage ?? '',
     },
     resolver: zodResolver(ZEmailPreferencesFormSchema),
   });
@@ -174,6 +177,35 @@ export const EmailPreferencesForm = ({
               </FormItem>
             )}
           /> */}
+
+          <FormField
+            control={form.control}
+            name="emailMessage"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Default Email Message</Trans>
+                </FormLabel>
+                <FormControl>
+                  <RichTextEditor
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>
+                    The default message to include in emails sent to recipients. HTML is supported.
+                  </Trans>
+                  {canInherit && (
+                    <span>
+                      {'. '}
+                      <Trans>Leave blank to inherit from the organisation.</Trans>
+                    </span>
+                  )}
+                </FormDescription>
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

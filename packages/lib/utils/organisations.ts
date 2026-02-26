@@ -132,11 +132,13 @@ export const generateDefaultOrganisationSettings = (): Omit<
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
+    accentColor: null,
 
     emailId: null,
     emailReplyTo: null,
     // emailReplyToName: null,
     emailDocumentSettings: DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+    emailMessage: null,
 
     defaultRecipients: null,
 

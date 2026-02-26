@@ -6,6 +6,7 @@ import {
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '../../constants/i18n';
+import { applyStringReplacements } from '../../utils/apply-string-replacements';
 import { env } from '../../utils/env';
 import { remember } from '../../utils/remember';
 
@@ -43,9 +44,25 @@ type AllI18nInstances = { [K in SupportedLanguages]: I18n };
 export const allI18nInstances = remember('i18n.allI18nInstances', async () => {
   const loadedMessages = await allMessages();
 
+  const { prisma } = await import('@documenso/prisma');
+  const replacements = await prisma.stringReplacement.findMany();
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return SUPPORTED_LANGUAGE_CODES.reduce((acc, lang) => {
-    const messages = loadedMessages[lang] ?? {};
+    const messages = { ...(loadedMessages[lang] ?? {}) };
+
+    if (replacements.length > 0) {
+      Object.keys(messages).forEach((key) => {
+        const val = messages[key];
+        if (typeof val === 'string') {
+          messages[key] = applyStringReplacements(val, replacements);
+        } else if (Array.isArray(val)) {
+          messages[key] = val.map((v) =>
+            typeof v === 'string' ? applyStringReplacements(v, replacements) : v,
+          );
+        }
+      });
+    }
 
     const i18n = setupI18n({
       locale: lang,

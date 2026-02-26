@@ -54,6 +54,7 @@ export const DocumentUploadButton = ({
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     multiple: internalVersion === '2',
     disabled,

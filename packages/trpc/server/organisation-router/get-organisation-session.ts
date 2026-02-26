@@ -88,9 +88,13 @@ export const getOrganisationSession = async ({
           currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
           preferences: {
             aiFeaturesEnabled: derivedSettings.aiFeaturesEnabled,
+            accentColor: derivedSettings.accentColor,
           },
         };
       }),
+      preferences: {
+        accentColor: organisationGlobalSettings.accentColor,
+      },
       currentOrganisationRole: getHighestOrganisationRoleInGroup(organisation.groups),
     };
   });

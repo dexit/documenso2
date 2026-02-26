@@ -17,6 +17,10 @@ type ErrorCodeMap = Record<
 export type GenericErrorLayoutProps = {
   children?: React.ReactNode;
   errorCode?: number;
+  custom404?: {
+    title: string;
+    content: string;
+  };
   errorCodeMap?: ErrorCodeMap;
   /**
    * The primary button to display. If left as undefined, the default home link will be displayed.
@@ -49,6 +53,7 @@ export const defaultErrorCodeMap: ErrorCodeMap = {
 export const GenericErrorLayout = ({
   children,
   errorCode,
+  custom404,
   errorCodeMap = defaultErrorCodeMap,
   primaryButton,
   secondaryButton,
@@ -58,6 +63,8 @@ export const GenericErrorLayout = ({
 
   const { subHeading, heading, message } =
     errorCodeMap[errorCode || 500] ?? defaultErrorCodeMap[500];
+
+  const displayHeading = errorCode === 404 && custom404?.title ? custom404.title : _(heading);
 
   return (
     <div className="fixed inset-0 z-0 flex h-screen w-screen items-center justify-center">
@@ -83,9 +90,16 @@ export const GenericErrorLayout = ({
         <div>
           <p className="text-muted-foreground font-semibold">{_(subHeading)}</p>
 
-          <h1 className="mt-3 text-2xl font-bold md:text-3xl">{_(heading)}</h1>
+          <h1 className="mt-3 text-2xl font-bold md:text-3xl">{displayHeading}</h1>
 
-          <p className="text-muted-foreground mt-4 text-sm">{_(message)}</p>
+          {errorCode === 404 && custom404?.content ? (
+            <div
+              className="prose prose-sm dark:prose-invert mt-4"
+              dangerouslySetInnerHTML={{ __html: custom404.content }}
+            />
+          ) : (
+            <p className="text-muted-foreground mt-4 text-sm">{_(message)}</p>
+          )}
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
             {secondaryButton ||

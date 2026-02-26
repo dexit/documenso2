@@ -45,12 +45,14 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+      accentColor,
 
       // Email related settings.
       emailId,
       emailReplyTo,
       // emailReplyToName,
       emailDocumentSettings,
+      emailMessage,
 
       // AI features settings.
       aiFeaturesEnabled,
@@ -157,12 +159,14 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+            accentColor,
 
             // Email related settings.
             emailId,
             emailReplyTo,
             // emailReplyToName,
             emailDocumentSettings,
+            emailMessage,
 
             // AI features settings.
             aiFeaturesEnabled,

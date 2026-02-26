@@ -74,6 +74,8 @@ model User {
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
+  emails Email[]
+
   @@index([email])
 }
 
@@ -173,6 +175,53 @@ enum WebhookTriggerEvents {
   DOCUMENT_REJECTED
   DOCUMENT_CANCELLED
   RECIPIENT_EXPIRED
+}
+
+model Email {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  to      String
+  subject String
+  body    String @db.Text
+  status  String @default("PENDING")
+
+  openedAt    DateTime?
+  deliveredAt DateTime?
+
+  recipientId Int?
+  recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: SetNull)
+
+  envelopeId String?
+  envelope   Envelope? @relation(fields: [envelopeId], references: [id], onDelete: SetNull)
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  interactions EmailInteraction[]
+}
+
+model EmailInteraction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  type      String
+  userAgent String?
+  ipAddress String?
+  data      Json?
+
+  emailId String
+  email   Email  @relation(fields: [emailId], references: [id], onDelete: Cascade)
+}
+
+model StringReplacement {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  original    String @unique
+  replacement String
 }
 
 model Webhook {
@@ -402,6 +451,7 @@ model Envelope {
   recipients    Recipient[]
   fields        Field[]
   shareLinks    DocumentShareLink[]
+  emails        Email[]
   auditLogs     DocumentAuditLog[]
 
   // Envelope settings
@@ -587,6 +637,7 @@ model Recipient {
   rejectionReason      String?
   role                 RecipientRole @default(SIGNER)
   readStatus           ReadStatus    @default(NOT_OPENED)
+  emails               Email[]
   signingStatus        SigningStatus @default(NOT_SIGNED)
   sendStatus           SendStatus    @default(NOT_SENT)
   envelope             Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
@@ -840,8 +891,10 @@ model OrganisationGlobalSettings {
   emailReplyTo          String?
   // emailReplyToName      String? // Placeholder for future feature.
   emailDocumentSettings Json /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+  emailMessage          String?
 
   brandingEnabled        Boolean @default(false)
+  accentColor            String?
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
@@ -879,8 +932,10 @@ model TeamGlobalSettings {
   emailReplyTo          String?
   // emailReplyToName      String? // Placeholder for future feature.
   emailDocumentSettings Json? /// [DocumentEmailSettingsNullable] @zod.custom.use(ZDocumentEmailSettingsSchema)
+  emailMessage          String?
 
   brandingEnabled        Boolean?
+  accentColor            String?
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?

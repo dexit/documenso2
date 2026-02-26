@@ -36,12 +36,14 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     brandingLogo: z.string().nullish(),
     brandingUrl: z.string().nullish(),
     brandingCompanyDetails: z.string().nullish(),
+    accentColor: z.string().nullish(),
 
     // Email related settings.
     emailId: z.string().nullish(),
     emailReplyTo: z.string().email().nullish(),
     // emailReplyToName: z.string().nullish(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.nullish(),
+    emailMessage: z.string().nullish(),
 
     // Default recipients settings.
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),

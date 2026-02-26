@@ -105,3 +105,56 @@ const getTransport = (): Transporter => {
 };
 
 export const mailer = getTransport();
+
+export type SendEmailOptions = {
+  to: string | { name: string; address: string };
+  subject: string;
+  html: string;
+  text?: string;
+  from?: string | { name: string; address: string };
+  replyTo?: string | { name: string; address: string };
+  recipientId?: number;
+  envelopeId?: string;
+  userId?: number;
+};
+
+/**
+ * Sends an email and logs it to the database for tracking.
+ */
+export const sendEmail = async (options: SendEmailOptions) => {
+  const { recipientId, envelopeId, userId, ...mailOptions } = options;
+
+  const { prisma } = await import('@documenso/prisma');
+
+  const emailRecord = await prisma.email.create({
+    data: {
+      to: typeof options.to === 'string' ? options.to : options.to.address,
+      subject: options.subject,
+      body: options.html,
+      recipientId,
+      envelopeId,
+      userId,
+      status: 'PENDING',
+    },
+  });
+
+  try {
+    const info = await mailer.sendMail(mailOptions);
+
+    await prisma.email.update({
+      where: { id: emailRecord.id },
+      data: {
+        status: 'SENT',
+        deliveredAt: new Date(), // Assuming immediate delivery for now, or update via webhook later
+      },
+    });
+
+    return info;
+  } catch (error) {
+    await prisma.email.update({
+      where: { id: emailRecord.id },
+      data: { status: 'FAILED' },
+    });
+    throw error;
+  }
+};

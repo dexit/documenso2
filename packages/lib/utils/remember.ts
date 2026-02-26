@@ -16,3 +16,11 @@ export function remember<T>(name: string, getValue: () => T): T {
 
   return thusly.__documenso_util_remember.get(name);
 }
+
+export function forget(name: string): void {
+  const thusly = globalThis;
+
+  if (thusly.__documenso_util_remember) {
+    thusly.__documenso_util_remember.delete(name);
+  }
+}

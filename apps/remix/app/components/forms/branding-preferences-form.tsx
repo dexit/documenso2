@@ -19,6 +19,7 @@ import {
   FormItem,
   FormLabel,
 } from '@documenso/ui/primitives/form/form';
+import { ColorPicker } from '@documenso/ui/primitives/color-picker';
 import { Input } from '@documenso/ui/primitives/input';
 import {
   Select,
@@ -46,13 +47,14 @@ const ZBrandingPreferencesFormSchema = z.object({
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
   brandingCompanyDetails: z.string().max(500).optional(),
+  accentColor: z.string().optional().nullable(),
 });
 
 export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferencesFormSchema>;
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails'
+  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails' | 'accentColor'
 >;
 
 export type BrandingPreferencesFormProps = {
@@ -82,6 +84,7 @@ export function BrandingPreferencesForm({
       brandingUrl: settings.brandingUrl ?? '',
       brandingLogo: undefined,
       brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
+      accentColor: settings.accentColor ?? '',
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
@@ -265,6 +268,37 @@ export function BrandingPreferencesForm({
                       )}
                     </FormDescription>
                   </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="accentColor"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Accent Color</Trans>
+                  </FormLabel>
+
+                  <FormControl>
+                    <div className="flex items-center gap-2">
+                      <ColorPicker
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        disabled={!isBrandingEnabled}
+                      />
+                      {canInherit && field.value === '' && (
+                        <span className="text-xs text-muted-foreground">
+                          <Trans>(Inheriting from organisation)</Trans>
+                        </span>
+                      )}
+                    </div>
+                  </FormControl>
+
+                  <FormDescription>
+                    <Trans>The primary accent color for your brand</Trans>
+                  </FormDescription>
                 </FormItem>
               )}
             />

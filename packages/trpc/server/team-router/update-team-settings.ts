@@ -47,12 +47,14 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+      accentColor,
 
       // Email related settings.
       emailId,
       emailReplyTo,
       // emailReplyToName,
       emailDocumentSettings,
+      emailMessage,
 
       // Default recipients settings.
       defaultRecipients,
@@ -163,6 +165,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+            accentColor,
 
             // Email related settings.
             emailId,
@@ -170,6 +173,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             // emailReplyToName,
             emailDocumentSettings:
               emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+            emailMessage,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
 
             // AI features settings.

@@ -18,9 +18,13 @@ export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend(
       currentTeamRole: z.nativeEnum(TeamMemberRole),
       preferences: z.object({
         aiFeaturesEnabled: z.boolean(),
+        accentColor: z.string().nullish(),
       }),
     }),
   ),
+  preferences: z.object({
+    accentColor: z.string().nullish(),
+  }),
   subscription: SubscriptionSchema.nullable(),
   currentOrganisationRole: z.nativeEnum(OrganisationMemberRole),
 }).array();

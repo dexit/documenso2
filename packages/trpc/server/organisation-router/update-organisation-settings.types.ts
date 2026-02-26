@@ -33,12 +33,14 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     brandingLogo: z.string().optional(),
     brandingUrl: z.string().optional(),
     brandingCompanyDetails: z.string().optional(),
+    accentColor: z.string().optional().nullable(),
 
     // Email related settings.
     emailId: z.string().nullish(),
     emailReplyTo: z.string().email().nullish(),
     // emailReplyToName: z.string().optional(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.optional(),
+    emailMessage: z.string().nullish(),
 
     // AI features settings.
     aiFeaturesEnabled: z.boolean().optional(),

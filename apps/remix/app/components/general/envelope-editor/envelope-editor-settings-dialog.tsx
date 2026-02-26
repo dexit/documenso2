@@ -66,6 +66,7 @@ import {
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { RichTextEditor } from '@documenso/ui/primitives/rich-text-editor';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
@@ -784,7 +785,11 @@ export const EnvelopeEditorSettingsDialog = ({
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="h-16 resize-none bg-background" {...field} />
+                              <RichTextEditor
+                                value={field.value}
+                                onChange={field.onChange}
+                                className="bg-background"
+                              />
                             </FormControl>
 
                             <FormMessage />

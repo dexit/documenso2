@@ -3,10 +3,14 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  Mail,
+  Languages,
+  Repeat,
   Settings,
   Trophy,
   Users,
   Wallet2,
+  Webhook,
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
@@ -63,6 +67,62 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/stats">
               <BarChart3 className="mr-2 h-5 w-5" />
               <Trans>Stats</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/translator') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/translator">
+              <Languages className="mr-2 h-5 w-5" />
+              <Trans>Translator</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/emails') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/emails">
+              <Mail className="mr-2 h-5 w-5" />
+              <Trans>Emails</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/webhooks') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/webhooks">
+              <Webhook className="mr-2 h-5 w-5" />
+              <Trans>Webhooks</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/jobs') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/jobs">
+              <Repeat className="mr-2 h-5 w-5" />
+              <Trans>Background Jobs</Trans>
             </Link>
           </Button>
 

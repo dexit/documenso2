@@ -2,6 +2,8 @@ import { P, match } from 'ts-pattern';
 
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
+import { getSiteSettings } from '../site-settings/get-site-settings';
+import { SITE_SETTINGS_EMAIL_DESIGN_ID } from '../site-settings/schemas/email-design';
 import type {
   DocumentMeta,
   EmailDomain,
@@ -78,6 +80,12 @@ type EmailContextResponse = {
   };
   replyToEmail: string | undefined;
   emailLanguage: string;
+  emailMessage: string | undefined;
+  globalDesign?: {
+    headerHtml?: string;
+    footerHtml?: string;
+    accentColor?: string;
+  };
 };
 
 export const getEmailContext = async (
@@ -85,7 +93,10 @@ export const getEmailContext = async (
 ): Promise<EmailContextResponse> => {
   const { source, meta } = options;
 
-  let emailContext: Omit<EmailContextResponse, 'senderEmail' | 'replyToEmail' | 'emailLanguage'>;
+  let emailContext: Omit<
+    EmailContextResponse,
+    'senderEmail' | 'replyToEmail' | 'emailLanguage' | 'globalDesign' | 'emailMessage'
+  >;
 
   if (source.type === 'organisation') {
     emailContext = await handleOrganisationEmailContext(source.organisationId);
@@ -102,6 +113,7 @@ export const getEmailContext = async (
       senderEmail: DOCUMENSO_INTERNAL_EMAIL,
       replyToEmail: undefined,
       emailLanguage, // Not sure if we want to use this for internal emails.
+      emailMessage: undefined,
     };
   }
 
@@ -127,11 +139,16 @@ export const getEmailContext = async (
       }
     : DOCUMENSO_INTERNAL_EMAIL;
 
+  const siteSettings = await getSiteSettings();
+  const emailDesign = siteSettings.find((s) => s.id === SITE_SETTINGS_EMAIL_DESIGN_ID);
+
   return {
     ...emailContext,
     senderEmail,
     replyToEmail,
     emailLanguage,
+    emailMessage: emailContext.settings.emailMessage || undefined,
+    globalDesign: emailDesign?.enabled ? (emailDesign.data as any) : undefined,
   };
 };
 

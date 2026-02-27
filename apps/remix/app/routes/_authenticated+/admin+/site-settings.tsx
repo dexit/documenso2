@@ -57,7 +57,7 @@ export default function AdminSiteSettingsPage({ loaderData }: Route.ComponentPro
 
   const handleUpdate = async (id: any, enabled: boolean, data: any) => {
     try {
-      await updateSiteSetting({ id, enabled, data });
+      await updateSiteSetting({ id, enabled, data } as any);
       toast({ title: _(msg`Settings Updated`) });
       await revalidate();
     } catch (err) {
@@ -186,7 +186,7 @@ function BannerForm({ banner, onUpdate, isUpdating }: any) {
                   <FormLabel><Trans>Content</Trans></FormLabel>
                   <FormControl>
                     <RichTextEditor
-                      value={field.value}
+                      value={field.value ?? ''}
                       onChange={field.onChange}
                       disabled={!enabled}
                     />
@@ -267,7 +267,7 @@ function Error404Form({ error404, onUpdate, isUpdating }: any) {
                   <FormLabel><Trans>Content (WYSIWYG)</Trans></FormLabel>
                   <FormControl>
                     <RichTextEditor
-                      value={field.value}
+                      value={field.value ?? ''}
                       onChange={field.onChange}
                       disabled={!enabled}
                     />

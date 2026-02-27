@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -20,7 +21,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 
 export default function AdminEmailsPage() {
-  const { t, i18n } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -34,26 +35,26 @@ export default function AdminEmailsPage() {
 
   const { mutate: retryEmail, isPending: isRetrying } = trpc.admin.email.retry.useMutation({
     onSuccess: () => {
-      toast({ title: t`Email resent successfully` });
+      toast({ title: _(msg`Email resent successfully`) });
       void refetch();
     },
     onError: () => {
-      toast({ title: t`Failed to resend email`, variant: 'destructive' });
+      toast({ title: _(msg`Failed to resend email`), variant: 'destructive' });
     },
   });
 
   const columns = useMemo(
     () => [
       {
-        header: t`To`,
+        header: _(msg`To`),
         accessorKey: 'to',
       },
       {
-        header: t`Subject`,
+        header: _(msg`Subject`),
         accessorKey: 'subject',
       },
       {
-        header: t`Status`,
+        header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }: { row: { original: any } }) => (
           <Badge variant={row.original.status === 'SENT' ? 'default' : 'neutral'}>
@@ -62,22 +63,22 @@ export default function AdminEmailsPage() {
         ),
       },
       {
-        header: t`Tracking`,
+        header: _(msg`Tracking`),
         cell: ({ row }: { row: { original: any } }) => {
           const interactions = row.original.interactions || [];
           const opens = interactions.filter((i: any) => i.type === 'OPEN').length;
           return (
             <div className="flex flex-col text-xs">
-              <span>{t`Opens`}: {opens}</span>
+              <span>{_(msg`Opens`)}: {opens}</span>
               {row.original.deliveredAt && (
-                <span className="text-green-600">{t`Delivered`}</span>
+                <span className="text-green-600">{_(msg`Delivered`)}</span>
               )}
             </div>
           );
         },
       },
       {
-        header: t`Sent At`,
+        header: _(msg`Sent At`),
         accessorKey: 'createdAt',
         cell: ({ row }: { row: { original: any } }) => i18n.date(row.original.createdAt),
       },
@@ -113,7 +114,7 @@ export default function AdminEmailsPage() {
         ),
       },
     ],
-    [t, i18n, isRetrying, retryEmail],
+    [_, i18n, isRetrying, retryEmail],
   );
 
   const results = data ?? {

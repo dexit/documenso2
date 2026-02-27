@@ -23,6 +23,7 @@ export const findStringReplacementsRoute = adminProcedure
 
     return {
       data,
+      count: totalCount,
       currentPage: page,
       perPage,
       totalPages: Math.ceil(totalCount / perPage),

@@ -27,6 +27,7 @@ export const findEmailsRoute = adminProcedure
 
     return {
       data,
+      count: totalCount,
       currentPage: page,
       perPage,
       totalPages: Math.ceil(totalCount / perPage),

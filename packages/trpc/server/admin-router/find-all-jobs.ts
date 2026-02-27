@@ -26,6 +26,7 @@ export const findAllJobsRoute = adminProcedure
 
     return {
       data,
+      count: totalCount,
       currentPage: page,
       perPage,
       totalPages: Math.ceil(totalCount / perPage),

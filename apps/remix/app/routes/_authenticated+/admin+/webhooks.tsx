@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -13,7 +14,7 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { RotateCcw } from 'lucide-react';
 
 export default function AdminWebhooksPage() {
-  const { t, i18n } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -27,30 +28,30 @@ export default function AdminWebhooksPage() {
 
   const { mutate: retryWebhook, isPending: isRetrying } = trpc.admin.webhook.retryCall.useMutation({
     onSuccess: () => {
-      toast({ title: t`Webhook resent successfully` });
+      toast({ title: _(msg`Webhook resent successfully`) });
       void refetch();
     },
     onError: () => {
-      toast({ title: t`Failed to resend webhook`, variant: 'destructive' });
+      toast({ title: _(msg`Failed to resend webhook`), variant: 'destructive' });
     },
   });
 
   const columns = useMemo(
     () => [
       {
-        header: t`Team`,
+        header: _(msg`Team`),
         cell: ({ row }: { row: { original: any } }) => row.original.webhook?.team?.name || 'N/A',
       },
       {
-        header: t`URL`,
+        header: _(msg`URL`),
         accessorKey: 'url',
       },
       {
-        header: t`Event`,
+        header: _(msg`Event`),
         accessorKey: 'event',
       },
       {
-        header: t`Status`,
+        header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }: { row: { original: any } }) => (
           <Badge variant={row.original.status === 'SUCCESS' ? 'default' : 'destructive'}>
@@ -59,11 +60,11 @@ export default function AdminWebhooksPage() {
         ),
       },
       {
-        header: t`Code`,
+        header: _(msg`Code`),
         accessorKey: 'responseCode',
       },
       {
-        header: t`Called At`,
+        header: _(msg`Called At`),
         accessorKey: 'createdAt',
         cell: ({ row }: { row: { original: any } }) => i18n.date(row.original.createdAt),
       },
@@ -81,7 +82,7 @@ export default function AdminWebhooksPage() {
         ),
       },
     ],
-    [t, i18n, isRetrying, retryWebhook],
+    [_, i18n, isRetrying, retryWebhook],
   );
 
   const results = data ?? {

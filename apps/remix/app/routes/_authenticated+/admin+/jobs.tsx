@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -13,7 +14,7 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { RotateCcw } from 'lucide-react';
 
 export default function AdminJobsPage() {
-  const { t, i18n } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -27,22 +28,22 @@ export default function AdminJobsPage() {
 
   const { mutate: retryJob, isPending: isRetrying } = trpc.admin.job.retry.useMutation({
     onSuccess: () => {
-      toast({ title: t`Job marked for retry` });
+      toast({ title: _(msg`Job marked for retry`) });
       void refetch();
     },
     onError: () => {
-      toast({ title: t`Failed to retry job`, variant: 'destructive' });
+      toast({ title: _(msg`Failed to retry job`), variant: 'destructive' });
     },
   });
 
   const columns = useMemo(
     () => [
       {
-        header: t`Name`,
+        header: _(msg`Name`),
         accessorKey: 'name',
       },
       {
-        header: t`Status`,
+        header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }: { row: { original: any } }) => (
           <Badge
@@ -59,21 +60,21 @@ export default function AdminJobsPage() {
         ),
       },
       {
-        header: t`Retries`,
+        header: _(msg`Retries`),
         accessorKey: 'retried',
         cell: ({ row }: { row: { original: any } }) =>
           `${row.original.retried} / ${row.original.maxRetries}`,
       },
       {
-        header: t`Submitted At`,
+        header: _(msg`Submitted At`),
         accessorKey: 'submittedAt',
         cell: ({ row }: { row: { original: any } }) => i18n.date(row.original.submittedAt),
       },
       {
-        header: t`Tasks`,
+        header: _(msg`Tasks`),
         cell: ({ row }: { row: { original: any } }) => {
           const tasks = row.original.tasks || [];
-          const completed = tasks.filter((t: any) => t.status === 'COMPLETED').length;
+          const completed = tasks.filter((task: any) => task.status === 'COMPLETED').length;
           return `${completed} / ${tasks.length}`;
         },
       },
@@ -91,7 +92,7 @@ export default function AdminJobsPage() {
         ),
       },
     ],
-    [t, i18n, isRetrying, retryJob],
+    [_, i18n, isRetrying, retryJob],
   );
 
   const results = data ?? {

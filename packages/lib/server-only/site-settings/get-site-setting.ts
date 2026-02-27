@@ -18,5 +18,5 @@ export const getSiteSetting = async <
   });
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return ZSiteSettingSchema.parse(setting) as U;
+  return ZSiteSettingSchema.parse(setting) as unknown as U;
 };

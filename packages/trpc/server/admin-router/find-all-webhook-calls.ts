@@ -30,6 +30,7 @@ export const findAllWebhookCallsRoute = adminProcedure
 
     return {
       data,
+      count: totalCount,
       currentPage: page,
       perPage,
       totalPages: Math.ceil(totalCount / perPage),

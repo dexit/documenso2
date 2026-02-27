@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -37,7 +38,7 @@ const ZReplacementFormSchema = z.object({
 });
 
 export default function AdminTranslatorPage() {
-  const { t } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -54,20 +55,20 @@ export default function AdminTranslatorPage() {
   const { mutate: upsertReplacement, isPending: isSaving } =
     trpc.admin.stringReplacement.upsert.useMutation({
       onSuccess: () => {
-        toast({ title: t`Replacement saved.` });
+        toast({ title: _(msg`Replacement saved.`) });
         setIsDialogOpen(false);
         setEditingId(null);
         void refetch();
       },
       onError: () => {
-        toast({ title: t`Failed to save replacement`, variant: 'destructive' });
+        toast({ title: _(msg`Failed to save replacement`), variant: 'destructive' });
       },
     });
 
   const { mutate: deleteReplacement } =
     trpc.admin.stringReplacement.delete.useMutation({
       onSuccess: () => {
-        toast({ title: t`Replacement deleted.` });
+        toast({ title: _(msg`Replacement deleted.`) });
         void refetch();
       },
     });
@@ -93,15 +94,15 @@ export default function AdminTranslatorPage() {
   const columns = useMemo(
     () => [
       {
-        header: t`Original Text`,
+        header: _(msg`Original Text`),
         accessorKey: 'original',
       },
       {
-        header: t`Replacement`,
+        header: _(msg`Replacement`),
         accessorKey: 'replacement',
       },
       {
-        header: t`Created At`,
+        header: _(msg`Created At`),
         accessorKey: 'createdAt',
         cell: ({ row }: any) => new Date(row.original.createdAt).toLocaleDateString(),
       },
@@ -117,7 +118,7 @@ export default function AdminTranslatorPage() {
               size="sm"
               className="text-destructive"
               onClick={() => {
-                if (confirm(t`Are you sure?`)) {
+                if (confirm(_(msg`Are you sure?`))) {
                   deleteReplacement({ id: row.original.id });
                 }
               }}
@@ -128,7 +129,7 @@ export default function AdminTranslatorPage() {
         ),
       },
     ],
-    [t],
+    [_],
   );
 
   const results = data ?? {
@@ -154,7 +155,7 @@ export default function AdminTranslatorPage() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingId ? t`Edit Replacement` : t`Add Replacement`}</DialogTitle>
+              <DialogTitle>{editingId ? _(msg`Edit Replacement`) : _(msg`Add Replacement`)}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit((v) => upsertReplacement(v))} className="space-y-4">

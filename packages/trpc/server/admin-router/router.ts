@@ -13,6 +13,9 @@ import { findAllWebhookCallsRoute } from './find-all-webhook-calls';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
+import { bulkDeleteEmailsRoute } from './bulk-delete-emails';
+import { bulkDeleteJobsRoute } from './bulk-delete-jobs';
+import { bulkDeleteWebhookCallsRoute } from './bulk-delete-webhook-calls';
 import { findEmailsRoute } from './find-emails';
 import { deleteStringReplacementRoute } from './delete-string-replacement';
 import { findStringReplacementsRoute } from './find-string-replacements';
@@ -81,14 +84,17 @@ export const adminRouter = router({
   email: {
     find: findEmailsRoute,
     retry: retryEmailRoute,
+    bulkDelete: bulkDeleteEmailsRoute,
   },
   webhook: {
     findAllCalls: findAllWebhookCallsRoute,
     retryCall: retryWebhookCallRoute,
+    bulkDeleteCalls: bulkDeleteWebhookCallsRoute,
   },
   job: {
     findAll: findAllJobsRoute,
     retry: retryJobRoute,
+    bulkDelete: bulkDeleteJobsRoute,
   },
   stringReplacement: {
     find: findStringReplacementsRoute,

@@ -3,7 +3,7 @@ import { P, match } from 'ts-pattern';
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
 import { getSiteSettings } from '../site-settings/get-site-settings';
-import { SITE_SETTINGS_EMAIL_DESIGN_ID } from '../site-settings/schemas/email-design';
+import { SITE_SETTINGS_EMAIL_DESIGN_ID, type TSiteSettingsEmailDesignSchema } from '../site-settings/schemas/email-design';
 import type {
   DocumentMeta,
   EmailDomain,
@@ -140,7 +140,7 @@ export const getEmailContext = async (
     : DOCUMENSO_INTERNAL_EMAIL;
 
   const siteSettings = await getSiteSettings();
-  const emailDesign = siteSettings.find((s) => s.id === SITE_SETTINGS_EMAIL_DESIGN_ID);
+  const emailDesign = siteSettings.find((s) => s.id === SITE_SETTINGS_EMAIL_DESIGN_ID) as TSiteSettingsEmailDesignSchema | undefined;
 
   return {
     ...emailContext,
@@ -148,7 +148,7 @@ export const getEmailContext = async (
     replyToEmail,
     emailLanguage,
     emailMessage: emailContext.settings.emailMessage || undefined,
-    globalDesign: emailDesign?.enabled ? (emailDesign.data as any) : undefined,
+    globalDesign: emailDesign?.enabled ? emailDesign.data : undefined,
   };
 };
 

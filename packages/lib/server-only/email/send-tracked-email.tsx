@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { mailer } from '@documenso/email/mailer';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getSiteSettings } from '../site-settings/get-site-settings';
-import { SITE_SETTINGS_EMAIL_DESIGN_ID } from '../site-settings/schemas/email-design';
+import { SITE_SETTINGS_EMAIL_DESIGN_ID, type TSiteSettingsEmailDesignSchema } from '../site-settings/schemas/email-design';
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 
 export type SendTrackedEmailOptions = {
@@ -33,8 +33,8 @@ export const sendTrackedEmail = async (options: SendTrackedEmailOptions) => {
   } = options;
 
   const siteSettings = await getSiteSettings();
-  const emailDesign = siteSettings.find((s) => s.id === SITE_SETTINGS_EMAIL_DESIGN_ID);
-  const globalDesign = emailDesign?.enabled ? (emailDesign.data as any) : undefined;
+  const emailDesign = siteSettings.find((s) => s.id === SITE_SETTINGS_EMAIL_DESIGN_ID) as TSiteSettingsEmailDesignSchema | undefined;
+  const globalDesign = emailDesign?.enabled ? emailDesign.data : undefined;
 
   const emailRecord = await prisma.email.create({
     data: {

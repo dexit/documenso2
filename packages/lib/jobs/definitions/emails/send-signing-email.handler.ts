@@ -27,7 +27,6 @@ import { extractDerivedDocumentEmailSettings } from '../../../types/document-ema
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
-import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
@@ -101,7 +100,6 @@ export const run = async ({
     senderEmail,
     replyToEmail,
     emailMessage: defaultEmailMessage,
-    globalDesign,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
       source: {

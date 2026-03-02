@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { Link as TiptapLink } from '@tiptap/extension-link';
 import { Underline as TiptapUnderline } from '@tiptap/extension-underline';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { type Editor, EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import {
   Bold,
@@ -29,7 +29,7 @@ export interface RichTextEditorProps {
   disabled?: boolean;
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: Editor }) => {
   if (!editor) {
     return null;
   }

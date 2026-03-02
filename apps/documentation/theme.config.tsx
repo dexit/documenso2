@@ -57,16 +57,6 @@ const themeConfig: DocsThemeConfig = {
       </span>
     ),
   },
-  primaryHue: 100,
-  primarySaturation: 48.47,
-  useNextSeoProps() {
-    return {
-      titleTemplate: '%s | PG eSign Docs',
-    };
-  color: {
-    hue: 100,
-    saturation: 48.47,
-  },
 };
 
 export default themeConfig;

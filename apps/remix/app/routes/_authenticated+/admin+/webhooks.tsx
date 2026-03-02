@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -6,12 +6,13 @@ import { useSearchParams } from 'react-router';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Badge } from '@documenso/ui/primitives/badge';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Trash } from 'lucide-react';
 
 export default function AdminWebhooksPage() {
   const { _, i18n } = useLingui();
@@ -20,6 +21,8 @@ export default function AdminWebhooksPage() {
   const updateSearchParams = useUpdateSearchParams();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
+
+  const [rowSelection, setRowSelection] = useState({});
 
   const { data, isLoading, refetch } = trpc.admin.webhook.findAllCalls.useQuery({
     page: parsedSearchParams.page,
@@ -36,8 +39,39 @@ export default function AdminWebhooksPage() {
     },
   });
 
+  const { mutate: bulkDelete, isPending: isDeleting } =
+    trpc.admin.webhook.bulkDeleteCalls.useMutation({
+      onSuccess: () => {
+        toast({ title: _(msg`Webhook calls deleted successfully`) });
+        setRowSelection({});
+        void refetch();
+      },
+      onError: () => {
+        toast({ title: _(msg`Failed to delete webhook calls`), variant: 'destructive' });
+      },
+    });
+
   const columns = useMemo(
     () => [
+      {
+        id: 'select',
+        header: ({ table }: { table: any }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }: { row: any }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
       {
         header: _(msg`Team`),
         cell: ({ row }: { row: { original: any } }) => row.original.webhook?.team?.name || 'N/A',
@@ -92,9 +126,26 @@ export default function AdminWebhooksPage() {
     totalPages: 1,
   };
 
+  const selectedIds = Object.keys(rowSelection);
+
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold"><Trans>Global Webhook Calls</Trans></h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">
+          <Trans>Global Webhook Calls</Trans>
+        </h2>
+        {selectedIds.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => bulkDelete({ ids: selectedIds })}
+            disabled={isDeleting}
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            <Trans>Delete Selected ({selectedIds.length})</Trans>
+          </Button>
+        )}
+      </div>
       <DataTable
         columns={columns as any}
         data={results.data}
@@ -103,6 +154,10 @@ export default function AdminWebhooksPage() {
         totalPages={results.totalPages}
         onPaginationChange={(page, perPage) => updateSearchParams({ page, perPage })}
         skeleton={{ enable: isLoading, rows: 5 }}
+        enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.id}
       >
         {(table) => <DataTablePagination table={table} />}
       </DataTable>

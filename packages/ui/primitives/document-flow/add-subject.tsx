@@ -43,8 +43,8 @@ import {
 } from '../../components/document/document-read-only-fields';
 import { AvatarWithText } from '../avatar';
 import { Input } from '../input';
+import { RichTextEditor } from '../rich-text-editor';
 import { useStep } from '../stepper';
-import { Textarea } from '../textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import { toast } from '../use-toast';
 import { type TAddSubjectFormSchema, ZAddSubjectFormSchema } from './add-subject.types';
@@ -330,10 +330,10 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Textarea
-                              className="mt-2 h-16 resize-none bg-background"
-                              {...field}
-                              maxLength={5000}
+                            <RichTextEditor
+                              className="mt-2"
+                              value={field.value ?? ''}
+                              onChange={field.onChange}
                             />
                           </FormControl>
                           <FormMessage />

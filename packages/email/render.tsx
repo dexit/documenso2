@@ -18,6 +18,8 @@ export type RenderOptions = ReactEmail.Options & {
   };
 };
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const colors = (config.theme?.extend?.colors || {}) as Record<string, string>;
 
@@ -26,7 +28,7 @@ export const render = async (element: React.ReactNode, options?: RenderOptions) 
 
   const trackingPixel = emailId ? (
     <img
-      src={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/track/email-open/${emailId}`}
+      src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/track/email-open/${emailId}`}
       width="1"
       height="1"
       style={{ display: 'none' }}
@@ -71,7 +73,7 @@ export const renderWithI18N = async (element: React.ReactNode, options?: RenderO
 
   const trackingPixel = emailId ? (
     <img
-      src={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/track/email-open/${emailId}`}
+      src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/track/email-open/${emailId}`}
       width="1"
       height="1"
       style={{ display: 'none' }}

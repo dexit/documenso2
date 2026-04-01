@@ -1,6 +1,9 @@
 import { router } from '../trpc';
 import { adminResendEmailRoute } from './admin-resend-email';
 import { adminUpdateDocumentMetaRoute } from './admin-update-document-meta';
+import { exportActivityLogsRoute } from './export-activity-logs';
+import { findEmailActivityRoute } from './find-email-activity';
+import { getActivityStatsRoute } from './get-activity-stats';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -81,6 +84,9 @@ export const adminRouter = router({
     findAllActivityLogs: findAllActivityLogsRoute,
     resendEmail: adminResendEmailRoute,
     updateDocumentMeta: adminUpdateDocumentMetaRoute,
+    exportActivityLogs: exportActivityLogsRoute,
+    findEmailActivity: findEmailActivityRoute,
+    getStats: getActivityStatsRoute,
   },
   recipient: {
     update: updateRecipientRoute,

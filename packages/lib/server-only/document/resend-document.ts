@@ -27,6 +27,10 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import {
+  generateEmailTrackingPixelUrl,
+  injectEmailTrackingPixel,
+} from '../../utils/email-tracking';
+import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
@@ -219,6 +223,12 @@ export const resendDocument = async ({
         }),
       ]);
 
+      const trackingPixelUrl = generateEmailTrackingPixelUrl({
+        envelopeId: envelope.id,
+        recipientId: recipient.id,
+        emailType: recipientEmailType,
+      });
+
       // Send email outside any transaction to avoid holding a connection
       // open during network I/O.
       await mailer.sendMail({
@@ -234,7 +244,7 @@ export const resendDocument = async ({
               customEmailTemplate,
             )
           : emailSubject,
-        html,
+        html: injectEmailTrackingPixel(html, trackingPixelUrl),
         text,
       });
 

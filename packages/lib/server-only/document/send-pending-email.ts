@@ -12,6 +12,10 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import {
+  generateEmailTrackingPixelUrl,
+  injectEmailTrackingPixel,
+} from '../../utils/email-tracking';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
@@ -93,6 +97,12 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
 
   const i18n = await getI18nInstance(emailLanguage);
 
+  const trackingPixelUrl = generateEmailTrackingPixelUrl({
+    envelopeId: envelope.id,
+    recipientId: recipient.id,
+    emailType: 'DOCUMENT_COMPLETED',
+  });
+
   await mailer.sendMail({
     to: {
       address: email,
@@ -101,7 +111,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     from: senderEmail,
     replyTo: replyToEmail,
     subject: i18n._(msg`Waiting for others to complete signing.`),
-    html,
+    html: injectEmailTrackingPixel(html, trackingPixelUrl),
     text,
   });
 };

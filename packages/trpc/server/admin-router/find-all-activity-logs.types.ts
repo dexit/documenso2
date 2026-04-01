@@ -1,29 +1,40 @@
 import { z } from 'zod';
 
-import { ZDocumentAuditLogSchema, ZDocumentAuditLogTypeSchema } from '@documenso/lib/types/document-audit-logs';
+import {
+  ZDocumentAuditLogSchema,
+  ZDocumentAuditLogTypeSchema,
+} from '@documenso/lib/types/document-audit-logs';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
 export const ZFindAllActivityLogsRequestSchema = ZFindSearchParamsSchema.extend({
   type: ZDocumentAuditLogTypeSchema.optional(),
-  envelopeId: z.string().optional(),
   email: z.string().optional(),
-  orderByColumn: z.enum(['createdAt']).optional(),
-  orderByDirection: z.enum(['asc', 'desc']).optional(),
+  teamId: z.number().optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+  orderByColumn: z.enum(['createdAt', 'type', 'email']).optional().default('createdAt'),
+  orderByDirection: z.enum(['asc', 'desc']).optional().default('desc'),
   perPage: z.number().optional().default(50),
+});
+
+export const ZEnvelopeInfoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  secondaryId: z.string(),
+  userId: z.number(),
+  teamId: z.number(),
+  team: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+    })
+    .nullable(),
 });
 
 export const ZActivityLogWithEnvelopeSchema = ZDocumentAuditLogSchema.and(
   z.object({
-    envelope: z
-      .object({
-        id: z.string(),
-        title: z.string(),
-        secondaryId: z.string(),
-        userId: z.number(),
-        teamId: z.number(),
-      })
-      .optional()
-      .nullable(),
+    envelope: ZEnvelopeInfoSchema.nullable(),
+    signingLink: z.string().nullable(),
   }),
 );
 

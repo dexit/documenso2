@@ -1,4 +1,6 @@
 import { router } from '../trpc';
+import { adminResendEmailRoute } from './admin-resend-email';
+import { adminUpdateDocumentMetaRoute } from './admin-update-document-meta';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -9,12 +11,14 @@ import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
+import { findAllActivityLogsRoute } from './find-all-activity-logs';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
+import { findRecipientStatsRoute } from './find-recipient-stats';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
@@ -74,9 +78,13 @@ export const adminRouter = router({
     findJobs: findDocumentJobsRoute,
     findAuditLogs: findDocumentAuditLogsRoute,
     downloadAuditLogs: downloadDocumentAuditLogsRoute,
+    findAllActivityLogs: findAllActivityLogsRoute,
+    resendEmail: adminResendEmailRoute,
+    updateDocumentMeta: adminUpdateDocumentMetaRoute,
   },
   recipient: {
     update: updateRecipientRoute,
+    findStats: findRecipientStatsRoute,
   },
   emailDomain: {
     find: findEmailDomainsRoute,

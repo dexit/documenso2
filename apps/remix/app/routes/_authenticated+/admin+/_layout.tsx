@@ -1,6 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import {
+  ActivityIcon,
   AlertTriangleIcon,
   BarChart3,
   Building2Icon,
@@ -169,6 +170,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Organisation Insights</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/activity-logs') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/activity-logs">
+              <ActivityIcon className="mr-2 h-5 w-5" />
+              <Trans>Activity Logs</Trans>
             </Link>
           </Button>
 

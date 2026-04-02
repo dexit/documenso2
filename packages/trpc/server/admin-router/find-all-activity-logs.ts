@@ -1,18 +1,15 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { parseDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
 import {
   ZFindAllActivityLogsRequestSchema,
-  ZFindAllActivityLogsResponseSchema,
 } from './find-all-activity-logs.types';
 
 export const findAllActivityLogsRoute = adminProcedure
   .input(ZFindAllActivityLogsRequestSchema)
-  .output(ZFindAllActivityLogsResponseSchema)
   .query(async ({ input }) => {
     const {
       page = 1,
@@ -76,34 +73,40 @@ export const findAllActivityLogsRoute = adminProcedure
       prisma.documentAuditLog.count({ where }),
     ]);
 
-    const parsedLogs = data.map(({ envelope, ...log }) => ({
-      parsed: parseDocumentAuditLogData(log),
-      envelope: envelope ?? null,
-    }));
+    type EnvelopeInfo = { id: string; title: string; secondaryId: string; userId: number; teamId: number | null; team: { id: number; name: string } | null } | null;
+    type ParsedEntry = { parsed: ReturnType<typeof parseDocumentAuditLogData>; envelope: EnvelopeInfo };
+
+    const parsedLogs: ParsedEntry[] = (data as Array<Record<string, unknown>>).map((row) => {
+      const { envelope, ...log } = row as { envelope: EnvelopeInfo } & Record<string, unknown>;
+      return {
+        parsed: parseDocumentAuditLogData(log as Parameters<typeof parseDocumentAuditLogData>[0]),
+        envelope: envelope ?? null,
+      };
+    });
 
     // Batch-load signing tokens for EMAIL_SENT entries on this page
     const recipientIds = parsedLogs
-      .filter((l) => l.parsed.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT)
-      .map((l) => {
+      .filter((l: ParsedEntry) => l.parsed.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT)
+      .map((l: ParsedEntry) => {
         try {
           return Number((l.parsed.data as Record<string, unknown>).recipientId);
         } catch {
           return null;
         }
       })
-      .filter((id): id is number => id !== null && !isNaN(id));
+      .filter((id: number | null): id is number => id !== null && !isNaN(id));
 
-    const recipientMap = new Map<number, { token: string; signingStatus: string }>();
+    const recipientMap = new Map<number, { id: number; token: string; signingStatus: string }>();
 
     if (recipientIds.length > 0) {
       const recipients = await prisma.recipient.findMany({
         where: { id: { in: recipientIds } },
         select: { id: true, token: true, signingStatus: true },
       });
-      recipients.forEach((r) => recipientMap.set(r.id, r));
+      (recipients as Array<{ id: number; token: string; signingStatus: string }>).forEach((r) => recipientMap.set(r.id, r));
     }
 
-    const result = parsedLogs.map(({ parsed, envelope }) => {
+    const result = parsedLogs.map(({ parsed, envelope }: ParsedEntry) => {
       let signingLink: string | null = null;
 
       if (parsed.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT) {
@@ -119,9 +122,9 @@ export const findAllActivityLogsRoute = adminProcedure
 
     return {
       data: result,
-      count,
+      count: count as number,
       currentPage: Math.max(page, 1),
       perPage,
-      totalPages: Math.ceil(count / perPage),
-    } satisfies FindResultResponse<typeof result>;
+      totalPages: Math.ceil((count as number) / perPage),
+    };
   });

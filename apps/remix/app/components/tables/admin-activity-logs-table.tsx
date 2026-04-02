@@ -78,12 +78,12 @@ type EditMetaState = {
   documentTitle: string;
 };
 
-const TYPE_BADGE: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; className?: string }> = {
+const TYPE_BADGE: Record<string, { label: string; variant: 'default' | 'secondary' | 'neutral' | 'destructive' | 'warning' | 'orange'; className?: string }> = {
   [DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT]: { label: 'Email Sent', variant: 'default', className: 'bg-blue-600 text-white' },
   [DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED]: { label: 'Email Opened', variant: 'default', className: 'bg-cyan-600 text-white' },
   [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT]: { label: 'Sign Request', variant: 'secondary' },
-  [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED]: { label: 'Doc Opened', variant: 'outline' },
-  [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED]: { label: 'Doc Viewed', variant: 'outline' },
+  [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED]: { label: 'Doc Opened', variant: 'neutral' },
+  [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED]: { label: 'Doc Viewed', variant: 'neutral' },
   [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED]: { label: 'Completed', variant: 'default', className: 'bg-green-600 text-white' },
   [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED]: { label: 'Signed', variant: 'default', className: 'bg-green-500 text-white' },
   [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED]: { label: 'Rejected', variant: 'destructive' },

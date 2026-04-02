@@ -60,7 +60,8 @@ export const exportActivityLogsRoute = adminProcedure
       'User Agent',
     ];
 
-    const rows = logs.map((log) =>
+    type LogRow = { id: string; type: string; createdAt: Date; name: string | null; email: string | null; ipAddress: string | null; userAgent: string | null; envelope: { title: string; secondaryId: string; team: { name: string } | null; user: { name: string | null; email: string } | null } | null };
+    const rows = (logs as LogRow[]).map((log) =>
       toCsvRow([
         log.id,
         log.type,

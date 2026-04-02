@@ -60,8 +60,9 @@ export const findEmailActivityRoute = adminProcedure
       prisma.documentAuditLog.count({ where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED } }),
     ]);
 
+    type LogRow = { id: string; envelopeId: string; createdAt: Date; data: unknown; email: string | null; name: string | null; ipAddress: string | null; userAgent: string | null; type: string; envelope: { id: string; title: string; secondaryId: string; team: { name: string } | null; user: { name: string | null; email: string } | null } | null };
     // Get open counts per (envelopeId, recipientId) for this page
-    const envelopeIds = [...new Set(emailSentLogs.map((l) => l.envelopeId))];
+    const envelopeIds = [...new Set((emailSentLogs as LogRow[]).map((l) => l.envelopeId))];
 
     type OpenCountRow = { envelopeid: string; recipientid: string; opencount: string; lastopenat: Date | null };
 
@@ -81,30 +82,31 @@ export const findEmailActivityRoute = adminProcedure
 
     // Map for quick lookup: `${envelopeId}:${recipientId}` → counts
     const openMap = new Map<string, { count: number; lastAt: Date | null }>(
-      openCountRows.map((r) => [
+      openCountRows.map((r: OpenCountRow) => [
         `${r.envelopeid}:${r.recipientid}`,
         { count: Number(r.opencount), lastAt: r.lastopenat ?? null },
       ]),
     );
 
     // Get signing tokens for non-signed recipients in this page
-    const recipientIds = emailSentLogs
+    const recipientIds = (emailSentLogs as LogRow[])
       .map((l) => {
         try { return Number((l.data as Record<string, unknown>).recipientId); } catch { return null; }
       })
-      .filter((id): id is number => id !== null && !isNaN(id));
+      .filter((id: number | null): id is number => id !== null && !isNaN(id));
 
-    const recipients =
+    type RecipientInfo = { id: number; token: string; signingStatus: string };
+    const recipients: RecipientInfo[] =
       recipientIds.length > 0
-        ? await prisma.recipient.findMany({
+        ? (await prisma.recipient.findMany({
             where: { id: { in: recipientIds } },
             select: { id: true, token: true, signingStatus: true },
-          })
+          })) as RecipientInfo[]
         : [];
 
-    const recipientMap = new Map(recipients.map((r) => [r.id, r]));
+    const recipientMap = new Map(recipients.map((r: RecipientInfo) => [r.id, r]));
 
-    const data = emailSentLogs.map((log) => {
+    const data = (emailSentLogs as LogRow[]).map((log) => {
       const d = log.data as Record<string, unknown>;
       const recipientId = Number(d.recipientId ?? 0);
       const openKey = `${log.envelopeId}:${recipientId}`;

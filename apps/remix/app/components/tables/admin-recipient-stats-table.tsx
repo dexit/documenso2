@@ -77,7 +77,7 @@ export const AdminRecipientStatsTable = () => {
         header: _(msg`Pending`),
         accessorKey: 'pendingDocuments',
         cell: ({ row }) => (
-          <Badge variant="outline">{row.original.pendingDocuments}</Badge>
+          <Badge variant="warning">{row.original.pendingDocuments}</Badge>
         ),
       },
       {

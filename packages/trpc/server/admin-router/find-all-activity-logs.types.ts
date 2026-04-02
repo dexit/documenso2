@@ -22,7 +22,7 @@ export const ZEnvelopeInfoSchema = z.object({
   title: z.string(),
   secondaryId: z.string(),
   userId: z.number(),
-  teamId: z.number(),
+  teamId: z.number().nullable(),
   team: z
     .object({
       id: z.number(),

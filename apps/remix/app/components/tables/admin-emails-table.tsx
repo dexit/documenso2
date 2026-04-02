@@ -186,7 +186,7 @@ export const AdminEmailsTable = () => {
             return (
               <div className="flex items-center gap-1">
                 <Badge variant="secondary" className="text-xs">{type}</Badge>
-                {isResend && <Badge variant="outline" className="text-xs"><Trans>Reminder</Trans></Badge>}
+                {isResend && <Badge variant="neutral" className="text-xs"><Trans>Reminder</Trans></Badge>}
               </div>
             );
           },

@@ -2,7 +2,9 @@ import { router } from '../trpc';
 import { adminResendEmailRoute } from './admin-resend-email';
 import { adminUpdateDocumentMetaRoute } from './admin-update-document-meta';
 import { exportActivityLogsRoute } from './export-activity-logs';
+import { findApiTokensRoute } from './find-api-tokens';
 import { findEmailActivityRoute } from './find-email-activity';
+import { findWebhookLogsRoute } from './find-webhook-logs';
 import { getActivityStatsRoute } from './get-activity-stats';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
@@ -91,6 +93,12 @@ export const adminRouter = router({
   recipient: {
     update: updateRecipientRoute,
     findStats: findRecipientStatsRoute,
+  },
+  webhook: {
+    findLogs: findWebhookLogsRoute,
+  },
+  apiToken: {
+    find: findApiTokensRoute,
   },
   emailDomain: {
     find: findEmailDomainsRoute,

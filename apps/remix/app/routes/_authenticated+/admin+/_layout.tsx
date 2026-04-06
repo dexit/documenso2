@@ -6,11 +6,13 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  KeyIcon,
   MailIcon,
   Settings,
   Trophy,
   Users,
   Wallet2,
+  WebhookIcon,
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
@@ -184,6 +186,48 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/activity-logs">
               <ActivityIcon className="mr-2 h-5 w-5" />
               <Trans>Activity Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/email' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/email">
+              <MailIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/webhooks' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/webhooks">
+              <WebhookIcon className="mr-2 h-5 w-5" />
+              <Trans>Webhook Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/api-tokens' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/api-tokens">
+              <KeyIcon className="mr-2 h-5 w-5" />
+              <Trans>API Tokens</Trans>
             </Link>
           </Button>
 

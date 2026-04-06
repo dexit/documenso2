@@ -5,11 +5,9 @@ import {
   CheckCircle2Icon,
   ClockIcon,
   FileTextIcon,
-  KeyIcon,
   MailIcon,
   MailOpenIcon,
   UsersIcon,
-  WebhookIcon,
   XCircleIcon,
 } from 'lucide-react';
 import { useSearchParams } from 'react-router';
@@ -20,10 +18,7 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { AdminActivityLogsTable } from '~/components/tables/admin-activity-logs-table';
-import { AdminApiTokensTable } from '~/components/tables/admin-api-tokens-table';
-import { AdminEmailsTable } from '~/components/tables/admin-emails-table';
 import { AdminRecipientStatsTable } from '~/components/tables/admin-recipient-stats-table';
-import { AdminWebhookLogsTable } from '~/components/tables/admin-webhook-logs-table';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
@@ -144,70 +139,18 @@ export default function AdminActivityLogsPage() {
             <ActivityIcon className="mr-2 h-4 w-4" />
             <Trans>All Activity</Trans>
           </TabsTrigger>
-          <TabsTrigger value="emails">
-            <MailIcon className="mr-2 h-4 w-4" />
-            <Trans>Emails</Trans>
-          </TabsTrigger>
           <TabsTrigger value="recipients">
             <UsersIcon className="mr-2 h-4 w-4" />
             <Trans>Recipients</Trans>
           </TabsTrigger>
-          <TabsTrigger value="webhooks">
-            <WebhookIcon className="mr-2 h-4 w-4" />
-            <Trans>Webhooks</Trans>
-          </TabsTrigger>
-          <TabsTrigger value="tokens">
-            <KeyIcon className="mr-2 h-4 w-4" />
-            <Trans>API Tokens</Trans>
-          </TabsTrigger>
         </TabsList>
 
-        {/* All Activity Tab */}
         <TabsContent value="activity">
           <AdminActivityLogsTable />
         </TabsContent>
 
-        {/* Emails Tab — dedicated email tracking view */}
-        <TabsContent value="emails">
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              <Trans>
-                All outbound emails with open-tracking status. A tracking pixel is embedded in
-                signing and reminder emails — open events appear automatically when recipients load
-                images.
-              </Trans>
-            </p>
-          </div>
-          <AdminEmailsTable />
-        </TabsContent>
-
-        {/* Recipients Tab */}
         <TabsContent value="recipients">
           <AdminRecipientStatsTable />
-        </TabsContent>
-
-        {/* Webhooks Tab */}
-        <TabsContent value="webhooks">
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              <Trans>
-                All webhook delivery attempts across all teams. View request/response payloads and filter by success or failure.
-              </Trans>
-            </p>
-          </div>
-          <AdminWebhookLogsTable />
-        </TabsContent>
-
-        {/* API Tokens Tab */}
-        <TabsContent value="tokens">
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              <Trans>
-                All API tokens across all teams. Manage and audit API access across your instance.
-              </Trans>
-            </p>
-          </div>
-          <AdminApiTokensTable />
         </TabsContent>
       </Tabs>
     </div>

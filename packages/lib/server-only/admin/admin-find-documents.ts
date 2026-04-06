@@ -1,4 +1,4 @@
-import { EnvelopeType, type Prisma } from '@prisma/client';
+import { type Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -8,12 +8,26 @@ export interface AdminFindDocumentsOptions {
   query?: string;
   page?: number;
   perPage?: number;
+  status?: 'DRAFT' | 'PENDING' | 'COMPLETED' | 'REJECTED';
+  dateFrom?: string;
+  dateTo?: string;
+  teamId?: number;
+  ownerEmail?: string;
+  orderBy?: 'createdAt' | 'updatedAt' | 'title';
+  orderByDirection?: 'asc' | 'desc';
 }
 
 export const adminFindDocuments = async ({
   query,
   page = 1,
   perPage = 10,
+  status,
+  dateFrom,
+  dateTo,
+  teamId,
+  ownerEmail,
+  orderBy = 'createdAt',
+  orderByDirection = 'desc',
 }: AdminFindDocumentsOptions) => {
   let termFilters: Prisma.EnvelopeWhereInput | undefined = !query
     ? undefined
@@ -25,44 +39,41 @@ export const adminFindDocuments = async ({
       };
 
   if (query && query.startsWith('envelope_')) {
-    termFilters = {
-      id: {
-        equals: query,
-      },
-    };
+    termFilters = { id: { equals: query } };
+  } else if (query && query.startsWith('document_')) {
+    termFilters = { secondaryId: { equals: query } };
+  } else if (query && !isNaN(parseInt(query))) {
+    termFilters = { secondaryId: { equals: `document_${query}` } };
   }
 
-  if (query && query.startsWith('document_')) {
-    termFilters = {
-      secondaryId: {
-        equals: query,
-      },
-    };
-  }
+  const where: Prisma.EnvelopeWhereInput = {
+    type: 'DOCUMENT' as string,
+    ...termFilters,
+    ...(status ? { status: status as string } : {}),
+    ...(teamId ? { teamId } : {}),
+    ...(ownerEmail ? { user: { email: { contains: ownerEmail, mode: 'insensitive' } } } : {}),
+    ...(dateFrom || dateTo
+      ? {
+          createdAt: {
+            ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
+            ...(dateTo ? { lte: new Date(dateTo) } : {}),
+          },
+        }
+      : {}),
+  };
 
-  if (query) {
-    const isQueryAnInteger = !isNaN(parseInt(query));
-
-    if (isQueryAnInteger) {
-      termFilters = {
-        secondaryId: {
-          equals: `document_${query}`,
-        },
-      };
-    }
-  }
+  const safeOrderBy = (['createdAt', 'updatedAt', 'title'] as const).includes(
+    orderBy as 'createdAt' | 'updatedAt' | 'title',
+  )
+    ? orderBy
+    : 'createdAt';
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        ...termFilters,
-      },
+      where,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { [safeOrderBy]: orderByDirection },
       include: {
         user: {
           select: {
@@ -76,6 +87,7 @@ export const adminFindDocuments = async ({
           select: {
             id: true,
             url: true,
+            name: true,
           },
         },
         envelopeItems: {
@@ -88,12 +100,7 @@ export const adminFindDocuments = async ({
         },
       },
     }),
-    prisma.envelope.count({
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        ...termFilters,
-      },
-    }),
+    prisma.envelope.count({ where }),
   ]);
 
   return {

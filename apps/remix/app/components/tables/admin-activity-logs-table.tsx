@@ -156,7 +156,8 @@ export const AdminActivityLogsTable = () => {
   const [editMessage, setEditMessage] = useState('');
 
   const [typeFilter, setTypeFilter] = useState<TDocumentAuditLogType | ''>('');
-  const [emailFilter, setEmailFilter] = useState('');
+  // Pre-populate email filter from URL ?email= param (used by "View activity" link from recipients)
+  const [emailFilter, setEmailFilter] = useState(() => searchParams.get('email') ?? '');
   const [queryFilter, setQueryFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');

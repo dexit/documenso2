@@ -78,10 +78,25 @@ export const findAllActivityLogsRoute = adminProcedure
 
     const parsedLogs: ParsedEntry[] = (data as Array<Record<string, unknown>>).map((row) => {
       const { envelope, ...log } = row as { envelope: EnvelopeInfo } & Record<string, unknown>;
-      return {
-        parsed: parseDocumentAuditLogData(log as Parameters<typeof parseDocumentAuditLogData>[0]),
-        envelope: envelope ?? null,
-      };
+      let parsed: ReturnType<typeof parseDocumentAuditLogData>;
+      try {
+        parsed = parseDocumentAuditLogData(log as Parameters<typeof parseDocumentAuditLogData>[0]);
+      } catch {
+        // Return a safe fallback for logs that fail schema validation (e.g. older format entries)
+        parsed = {
+          id: String(log.id ?? ''),
+          envelopeId: String(log.envelopeId ?? ''),
+          createdAt: log.createdAt instanceof Date ? log.createdAt : new Date(String(log.createdAt ?? Date.now())),
+          type: String(log.type ?? 'UNKNOWN') as Parameters<typeof parseDocumentAuditLogData>[0]['type'],
+          name: log.name != null ? String(log.name) : null,
+          email: log.email != null ? String(log.email) : null,
+          userId: log.userId != null ? Number(log.userId) : null,
+          userAgent: log.userAgent != null ? String(log.userAgent) : null,
+          ipAddress: log.ipAddress != null ? String(log.ipAddress) : null,
+          data: (log.data ?? {}) as ReturnType<typeof parseDocumentAuditLogData>['data'],
+        };
+      }
+      return { parsed, envelope: envelope ?? null };
     });
 
     // Batch-load signing tokens for EMAIL_SENT entries on this page

@@ -6,7 +6,13 @@ import { findApiTokensRoute } from './find-api-tokens';
 import { findEmailActivityRoute } from './find-email-activity';
 import { findWebhookLogsRoute } from './find-webhook-logs';
 import { findAdminWebhooksRoute } from './find-admin-webhooks';
-import { getHttpMonitorRoute } from './get-http-monitor';
+import {
+  addHttpBlockListRoute,
+  getHttpBlockListRoute,
+  getHttpMonitorRoute,
+  removeHttpBlockListRoute,
+} from './get-http-monitor';
+import { getSystemEmailLogsRoute } from './get-system-email-logs';
 import { getActivityStatsRoute } from './get-activity-stats';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
@@ -79,6 +85,12 @@ export const adminRouter = router({
   },
   httpMonitor: {
     get: getHttpMonitorRoute,
+    blockList: getHttpBlockListRoute,
+    addBlock: addHttpBlockListRoute,
+    removeBlock: removeHttpBlockListRoute,
+  },
+  systemEmailLogs: {
+    get: getSystemEmailLogsRoute,
   },
   document: {
     find: findDocumentsRoute,

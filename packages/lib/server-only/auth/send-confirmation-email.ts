@@ -7,6 +7,7 @@ import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { logSystemEmail } from '../system-email-log/store';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import {
   DOCUMENSO_INTERNAL_EMAIL,
@@ -57,13 +58,23 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
 
   const i18n = await getI18nInstance();
 
+  const subject = i18n._(msg`Please confirm your email`);
+
+  logSystemEmail({
+    type: 'signup_confirmation',
+    recipientEmail: user.email,
+    recipientName: user.name ?? null,
+    subject,
+    metadata: { userId, confirmationLink },
+  });
+
   return mailer.sendMail({
     to: {
       address: user.email,
       name: user.name || '',
     },
     from: DOCUMENSO_INTERNAL_EMAIL,
-    subject: i18n._(msg`Please confirm your email`),
+    subject,
     html,
     text,
   });

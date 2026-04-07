@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { logSystemEmail } from '../system-email-log/store';
 import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
@@ -50,6 +51,16 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
 
   const i18n = await getI18nInstance();
 
+  const subject = i18n._(msg`Forgot Password?`);
+
+  logSystemEmail({
+    type: 'password_reset',
+    recipientEmail: user.email,
+    recipientName: user.name ?? null,
+    subject,
+    metadata: { userId },
+  });
+
   return await mailer.sendMail({
     to: {
       address: user.email,
@@ -59,7 +70,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
       name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
       address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
     },
-    subject: i18n._(msg`Forgot Password?`),
+    subject,
     html,
     text,
   });

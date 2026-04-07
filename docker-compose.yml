@@ -1,7 +1,69 @@
 name: documenso
 
+# ─── Shared environment for the app & worker ───────────────────────────────
+x-documenso-env: &documenso-env
+  NODE_ENV: production
+  PORT: ${PORT:-3000}
+
+  # Auth / Encryption
+  NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET in .env}
+  NEXT_PRIVATE_ENCRYPTION_KEY: ${NEXT_PRIVATE_ENCRYPTION_KEY:?Set NEXT_PRIVATE_ENCRYPTION_KEY in .env}
+  NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?Set NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY in .env}
+
+  # URLs
+  NEXT_PUBLIC_WEBAPP_URL: ${NEXT_PUBLIC_WEBAPP_URL:-http://localhost:3000}
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL: http://documenso:${PORT:-3000}
+
+  # Database — points to internal postgres container
+  NEXT_PRIVATE_DATABASE_URL: postgres://${POSTGRES_USER:-documenso}:${POSTGRES_PASSWORD:-password}@database:5432/${POSTGRES_DB:-documenso}
+  NEXT_PRIVATE_DIRECT_DATABASE_URL: postgres://${POSTGRES_USER:-documenso}:${POSTGRES_PASSWORD:-password}@database:5432/${POSTGRES_DB:-documenso}
+
+  # Storage — Minio (S3 compatible)
+  NEXT_PUBLIC_UPLOAD_TRANSPORT: s3
+  NEXT_PRIVATE_UPLOAD_ENDPOINT: http://minio:9000
+  NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: "true"
+  NEXT_PRIVATE_UPLOAD_REGION: ${NEXT_PRIVATE_UPLOAD_REGION:-us-east-1}
+  NEXT_PRIVATE_UPLOAD_BUCKET: ${NEXT_PRIVATE_UPLOAD_BUCKET:-documenso}
+  NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-documenso}
+  NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
+
+  # Jobs — BullMQ via Redis (set to 'inngest' to use Inngest cloud instead)
+  NEXT_PRIVATE_JOBS_PROVIDER: ${NEXT_PRIVATE_JOBS_PROVIDER:-bullmq}
+  NEXT_PRIVATE_REDIS_URL: redis://redis:6379
+  NEXT_PRIVATE_REDIS_PREFIX: ${NEXT_PRIVATE_REDIS_PREFIX:-documenso}
+  NEXT_PRIVATE_BULLMQ_CONCURRENCY: ${NEXT_PRIVATE_BULLMQ_CONCURRENCY:-10}
+
+  # Inngest (optional — only used when NEXT_PRIVATE_JOBS_PROVIDER=inngest)
+  NEXT_PRIVATE_INNGEST_EVENT_KEY: ${NEXT_PRIVATE_INNGEST_EVENT_KEY:-}
+  INNGEST_EVENT_KEY: ${NEXT_PRIVATE_INNGEST_EVENT_KEY:-}
+
+  # SMTP
+  NEXT_PRIVATE_SMTP_TRANSPORT: ${NEXT_PRIVATE_SMTP_TRANSPORT:-smtp-auth}
+  NEXT_PRIVATE_SMTP_HOST: ${NEXT_PRIVATE_SMTP_HOST:-}
+  NEXT_PRIVATE_SMTP_PORT: ${NEXT_PRIVATE_SMTP_PORT:-587}
+  NEXT_PRIVATE_SMTP_USERNAME: ${NEXT_PRIVATE_SMTP_USERNAME:-}
+  NEXT_PRIVATE_SMTP_PASSWORD: ${NEXT_PRIVATE_SMTP_PASSWORD:-}
+  NEXT_PRIVATE_SMTP_SECURE: ${NEXT_PRIVATE_SMTP_SECURE:-false}
+  NEXT_PRIVATE_SMTP_FROM_NAME: ${NEXT_PRIVATE_SMTP_FROM_NAME:-Documenso}
+  NEXT_PRIVATE_SMTP_FROM_ADDRESS: ${NEXT_PRIVATE_SMTP_FROM_ADDRESS:-noreply@example.com}
+
+  # Signing
+  NEXT_PRIVATE_SIGNING_TRANSPORT: ${NEXT_PRIVATE_SIGNING_TRANSPORT:-local}
+  NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: /opt/documenso/cert.p12
+  NEXT_PRIVATE_SIGNING_PASSPHRASE: ${NEXT_PRIVATE_SIGNING_PASSPHRASE:-}
+
+  # License & billing
+  NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY: ${NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY:-}
+  NEXT_PRIVATE_SUPER_BYPASS_LICENSE: ${NEXT_PRIVATE_SUPER_BYPASS_LICENSE:-false}
+
+  # Optional
+  NEXT_PRIVATE_GOOGLE_CLIENT_ID: ${NEXT_PRIVATE_GOOGLE_CLIENT_ID:-}
+  NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET:-}
+  NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT:-50}
+
+
 services:
-  # ─── PostgreSQL Database ────────────────────────────────────────────────────
+  # ─── PostgreSQL ─────────────────────────────────────────────────────────────
   database:
     image: postgres:15-alpine
     container_name: documenso-db
@@ -20,7 +82,23 @@ services:
     networks:
       - documenso-internal
 
-  # ─── Minio (S3-compatible storage) ─────────────────────────────────────────
+  # ─── Redis (BullMQ backend) ──────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: documenso-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - documenso-internal
+
+  # ─── Minio (S3-compatible object storage) ───────────────────────────────────
   minio:
     image: minio/minio:latest
     container_name: documenso-minio
@@ -32,7 +110,7 @@ services:
     volumes:
       - minio:/data
     ports:
-      - "9001:9001"   # Minio Console UI (admin)
+      - "9001:9001"   # Minio Console UI — access at http://<host>:9001
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 30s
@@ -64,6 +142,26 @@ services:
     networks:
       - documenso-internal
 
+  # ─── Inngest Dev Server (local job runner — optional) ───────────────────────
+  #
+  # Only used when NEXT_PRIVATE_JOBS_PROVIDER=inngest.
+  # Remove this block if you are using BullMQ (the default).
+  #
+  inngest:
+    image: inngest/inngest:latest
+    container_name: documenso-inngest
+    restart: unless-stopped
+    command: inngest dev --host 0.0.0.0 --port 8288 --no-discovery
+    ports:
+      - "8288:8288"   # Inngest Dev UI — http://<host>:8288
+    environment:
+      INNGEST_DEV: "1"
+    networks:
+      - documenso-internal
+      - documenso-public
+    profiles:
+      - inngest   # Only started with: docker compose --profile inngest up
+
   # ─── Documenso App ──────────────────────────────────────────────────────────
   documenso:
     build:
@@ -74,54 +172,12 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       minio-init:
         condition: service_completed_successfully
     environment:
-      PORT: ${PORT:-3000}
-      NODE_ENV: production
-
-      # Auth
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET in .env}
-      NEXT_PRIVATE_ENCRYPTION_KEY: ${NEXT_PRIVATE_ENCRYPTION_KEY:?Set NEXT_PRIVATE_ENCRYPTION_KEY in .env}
-      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?Set NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY in .env}
-
-      # URLs
-      NEXT_PUBLIC_WEBAPP_URL: ${NEXT_PUBLIC_WEBAPP_URL:-http://localhost:3000}
-      NEXT_PRIVATE_INTERNAL_WEBAPP_URL: http://documenso:${PORT:-3000}
-
-      # Database — points to the internal postgres container
-      NEXT_PRIVATE_DATABASE_URL: postgres://${POSTGRES_USER:-documenso}:${POSTGRES_PASSWORD:-password}@database:5432/${POSTGRES_DB:-documenso}
-      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgres://${POSTGRES_USER:-documenso}:${POSTGRES_PASSWORD:-password}@database:5432/${POSTGRES_DB:-documenso}
-
-      # Storage — Minio (S3 compatible)
-      NEXT_PUBLIC_UPLOAD_TRANSPORT: s3
-      NEXT_PRIVATE_UPLOAD_ENDPOINT: http://minio:9000
-      NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: "true"
-      NEXT_PRIVATE_UPLOAD_REGION: ${NEXT_PRIVATE_UPLOAD_REGION:-us-east-1}
-      NEXT_PRIVATE_UPLOAD_BUCKET: ${NEXT_PRIVATE_UPLOAD_BUCKET:-documenso}
-      NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-documenso}
-      NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
-
-      # SMTP
-      NEXT_PRIVATE_SMTP_TRANSPORT: ${NEXT_PRIVATE_SMTP_TRANSPORT:-smtp-auth}
-      NEXT_PRIVATE_SMTP_HOST: ${NEXT_PRIVATE_SMTP_HOST:-}
-      NEXT_PRIVATE_SMTP_PORT: ${NEXT_PRIVATE_SMTP_PORT:-587}
-      NEXT_PRIVATE_SMTP_USERNAME: ${NEXT_PRIVATE_SMTP_USERNAME:-}
-      NEXT_PRIVATE_SMTP_PASSWORD: ${NEXT_PRIVATE_SMTP_PASSWORD:-}
-      NEXT_PRIVATE_SMTP_SECURE: ${NEXT_PRIVATE_SMTP_SECURE:-false}
-      NEXT_PRIVATE_SMTP_FROM_NAME: ${NEXT_PRIVATE_SMTP_FROM_NAME:-Documenso}
-      NEXT_PRIVATE_SMTP_FROM_ADDRESS: ${NEXT_PRIVATE_SMTP_FROM_ADDRESS:-noreply@example.com}
-
-      # Signing
-      NEXT_PRIVATE_SIGNING_TRANSPORT: ${NEXT_PRIVATE_SIGNING_TRANSPORT:-local}
-      NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: /opt/documenso/cert.p12
-      NEXT_PRIVATE_SIGNING_PASSPHRASE: ${NEXT_PRIVATE_SIGNING_PASSPHRASE:-}
-
-      # Optional
-      NEXT_PRIVATE_GOOGLE_CLIENT_ID: ${NEXT_PRIVATE_GOOGLE_CLIENT_ID:-}
-      NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET:-}
-      NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT:-50}
-      NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY: ${NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY:-}
+      <<: *documenso-env
     volumes:
       - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
     expose:
@@ -129,21 +185,61 @@ services:
     networks:
       - documenso-internal
       - documenso-public
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:${PORT:-3000}/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ─── BullMQ Worker ──────────────────────────────────────────────────────────
+  #
+  # Runs background jobs (document processing, emails, webhooks).
+  # Uses the same image as the app — started with `npm run worker` (or the
+  # Dockerfile CMD if a separate worker entrypoint is defined).
+  #
+  # Note: If your Dockerfile only exposes one entrypoint (the web server),
+  # override the command here to run the worker process instead.
+  worker:
+    build:
+      context: .
+      dockerfile: apps/remix/Dockerfile
+    container_name: documenso-worker
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *documenso-env
+      # Override so this container only runs the worker
+      WORKER_ONLY: "true"
+    command: ["node", "worker.js"]
+    volumes:
+      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+    networks:
+      - documenso-internal
+    profiles:
+      - worker   # Only started with: docker compose --profile worker up
 
   # ─── Nginx Proxy Manager ────────────────────────────────────────────────────
+  #
+  # Admin UI:   http://<host>:81   (default login: admin@example.com / changeme)
+  # HTTP:       port 80  (also used for Let's Encrypt HTTP-01 challenge)
+  # HTTPS:      port 443 (SSL termination — configure domains in the NPM UI)
+  #
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: documenso-nginx
     restart: unless-stopped
     depends_on:
-      - documenso
+      documenso:
+        condition: service_healthy
     ports:
-      - "80:80"       # HTTP (also used by Let's Encrypt HTTP challenge)
-      - "443:443"     # HTTPS
-      - "81:81"       # NPM Admin UI — access at http://<host>:81
-    environment:
-      # Disable SQLite in favor of keeping it simple (SQLite is default)
-      DB_SQLITE_FILE: /data/database.sqlite
+      - "80:80"     # HTTP → redirect to HTTPS / Let's Encrypt challenge
+      - "443:443"   # HTTPS — SSL terminated here, proxied to documenso:3000
+      - "81:81"     # NPM Admin UI
     volumes:
       - npm-data:/data
       - npm-letsencrypt:/etc/letsencrypt
@@ -155,16 +251,18 @@ services:
     networks:
       - documenso-public
 
+
 volumes:
   database:
+  redis:
   minio:
   npm-data:
   npm-letsencrypt:
 
 networks:
-  # Internal network — db, minio, and app communicate here (not exposed)
+  # Internal only — database, redis, minio ↔ app (not reachable from outside)
   documenso-internal:
     driver: bridge
-  # Public network — nginx proxy manager routes to documenso
+  # Public — nginx proxy manager ↔ app (and minio console)
   documenso-public:
     driver: bridge

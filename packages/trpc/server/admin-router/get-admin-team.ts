@@ -44,7 +44,7 @@ export const getAdminTeamRoute = adminProcedure
       });
     }
 
-    const [teamMembers, pendingInvites] = await Promise.all([
+    const [teamMembers, documentCount, pendingInvites] = await Promise.all([
       prisma.organisationMember.findMany({
         where: {
           organisationId: team.organisationId,
@@ -89,6 +89,7 @@ export const getAdminTeamRoute = adminProcedure
           },
         },
       }),
+      prisma.envelope.count({ where: { teamId } }),
       // Invites are organisation-scoped in the schema (no team relation), so this is intentionally
       // all pending invites for the team's parent organisation.
       prisma.organisationMemberInvite.findMany({
@@ -125,6 +126,7 @@ export const getAdminTeamRoute = adminProcedure
     return {
       ...team,
       memberCount: mappedTeamMembers.length,
+      documentCount,
       teamMembers: mappedTeamMembers,
       pendingInvites,
     };

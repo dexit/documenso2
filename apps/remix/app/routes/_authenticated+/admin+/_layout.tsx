@@ -8,8 +8,10 @@ import {
   FileStack,
   KeyIcon,
   MailIcon,
+  MonitorIcon,
   Settings,
   Trophy,
+  UserCheckIcon,
   Users,
   Wallet2,
   WebhookIcon,
@@ -179,6 +181,34 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
+              pathname?.startsWith('/admin/recipients') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/recipients">
+              <UserCheckIcon className="mr-2 h-5 w-5" />
+              <Trans>Recipients</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/webhooks') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/webhooks">
+              <WebhookIcon className="mr-2 h-5 w-5" />
+              <Trans>Webhooks</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
               pathname?.startsWith('/admin/activity-logs') && 'bg-secondary',
             )}
             asChild
@@ -228,6 +258,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/logs/api-tokens">
               <KeyIcon className="mr-2 h-5 w-5" />
               <Trans>API Tokens</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/http-monitor') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/http-monitor">
+              <MonitorIcon className="mr-2 h-5 w-5" />
+              <Trans>HTTP Monitor</Trans>
             </Link>
           </Button>
 

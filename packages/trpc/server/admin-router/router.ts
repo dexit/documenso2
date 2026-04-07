@@ -5,6 +5,8 @@ import { exportActivityLogsRoute } from './export-activity-logs';
 import { findApiTokensRoute } from './find-api-tokens';
 import { findEmailActivityRoute } from './find-email-activity';
 import { findWebhookLogsRoute } from './find-webhook-logs';
+import { findAdminWebhooksRoute } from './find-admin-webhooks';
+import { getHttpMonitorRoute } from './get-http-monitor';
 import { getActivityStatsRoute } from './get-activity-stats';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
@@ -75,6 +77,9 @@ export const adminRouter = router({
     resetTwoFactor: resetTwoFactorRoute,
     findTeams: findUserTeamsRoute,
   },
+  httpMonitor: {
+    get: getHttpMonitorRoute,
+  },
   document: {
     find: findDocumentsRoute,
     findUnsealed: findUnsealedDocumentsRoute,
@@ -95,6 +100,7 @@ export const adminRouter = router({
     findStats: findRecipientStatsRoute,
   },
   webhook: {
+    find: findAdminWebhooksRoute,
     findLogs: findWebhookLogsRoute,
   },
   apiToken: {

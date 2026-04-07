@@ -29,33 +29,38 @@ type GetOrganisationOptions = {
 };
 
 export const getAdminOrganisation = async ({ organisationId }: GetOrganisationOptions) => {
-  const organisation = await prisma.organisation.findFirst({
-    where: {
-      id: organisationId,
-    },
-    include: {
-      organisationClaim: true,
-      organisationGlobalSettings: true,
-      teams: true,
-      members: {
-        include: {
-          organisationGroupMembers: {
-            include: {
-              group: true,
+  const [organisation, documentCount] = await Promise.all([
+    prisma.organisation.findFirst({
+      where: {
+        id: organisationId,
+      },
+      include: {
+        organisationClaim: true,
+        organisationGlobalSettings: true,
+        teams: true,
+        members: {
+          include: {
+            organisationGroupMembers: {
+              include: {
+                group: true,
+              },
             },
-          },
-          user: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true,
+              },
             },
           },
         },
+        subscription: true,
       },
-      subscription: true,
-    },
-  });
+    }),
+    prisma.envelope.count({
+      where: { team: { organisationId } },
+    }),
+  ]);
 
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -63,5 +68,5 @@ export const getAdminOrganisation = async ({ organisationId }: GetOrganisationOp
     });
   }
 
-  return organisation;
+  return { ...organisation, documentCount };
 };

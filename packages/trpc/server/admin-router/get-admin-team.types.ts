@@ -24,6 +24,7 @@ export const ZGetAdminTeamResponseSchema = TeamSchema.extend({
   teamEmail: TeamEmailSchema.nullable(),
   teamGlobalSettings: TeamGlobalSettingsSchema.nullable(),
   memberCount: z.number(),
+  documentCount: z.number(),
   teamMembers: OrganisationMemberSchema.pick({
     id: true,
     userId: true,

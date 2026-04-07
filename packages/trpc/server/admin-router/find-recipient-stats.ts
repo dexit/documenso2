@@ -1,3 +1,5 @@
+import { DocumentStatus, SigningStatus } from '@prisma/client';
+
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { prisma } from '@documenso/prisma';
 
@@ -53,7 +55,7 @@ export const findRecipientStatsRoute = adminProcedure
       } satisfies FindResultResponse<[]>;
     }
 
-    const emails = sliced.map((r: { email: string }) => r.email);
+    const emails = sliced.map((r) => r.email);
 
     // Get per-status counts for each email using separate counts
     const [completedCounts, pendingCounts, rejectedCounts, latestNames] = await Promise.all([
@@ -62,9 +64,9 @@ export const findRecipientStatsRoute = adminProcedure
         where: {
           email: { in: emails },
           documentDeletedAt: null,
-          signingStatus: 'SIGNED' as string,
+          signingStatus: SigningStatus.SIGNED,
           envelope: {
-            status: 'COMPLETED' as string,
+            status: DocumentStatus.COMPLETED,
           },
         },
         _count: { id: true },
@@ -74,9 +76,9 @@ export const findRecipientStatsRoute = adminProcedure
         where: {
           email: { in: emails },
           documentDeletedAt: null,
-          signingStatus: 'NOT_SIGNED' as string,
+          signingStatus: SigningStatus.NOT_SIGNED,
           envelope: {
-            status: { in: ['PENDING'] as string[] },
+            status: { in: [DocumentStatus.PENDING] },
           },
         },
         _count: { id: true },
@@ -86,7 +88,7 @@ export const findRecipientStatsRoute = adminProcedure
         where: {
           email: { in: emails },
           documentDeletedAt: null,
-          signingStatus: 'REJECTED' as string,
+          signingStatus: SigningStatus.REJECTED,
         },
         _count: { id: true },
       }),
@@ -103,12 +105,12 @@ export const findRecipientStatsRoute = adminProcedure
       }),
     ]);
 
-    const completedMap = new Map(completedCounts.map((r: { email: string; _count: { id: number } }) => [r.email, r._count.id]));
-    const pendingMap = new Map(pendingCounts.map((r: { email: string; _count: { id: number } }) => [r.email, r._count.id]));
-    const rejectedMap = new Map(rejectedCounts.map((r: { email: string; _count: { id: number } }) => [r.email, r._count.id]));
-    const nameMap = new Map(latestNames.map((r: { email: string; name: string }) => [r.email, r.name]));
+    const completedMap = new Map(completedCounts.map((r) => [r.email, r._count.id ?? 0]));
+    const pendingMap = new Map(pendingCounts.map((r) => [r.email, r._count.id ?? 0]));
+    const rejectedMap = new Map(rejectedCounts.map((r) => [r.email, r._count.id ?? 0]));
+    const nameMap = new Map(latestNames.map((r) => [r.email, r.name]));
 
-    const data = sliced.map((r: { email: string; _count: { id: number }; _max: { signedAt: Date | null } }) => ({
+    const data = sliced.map((r) => ({
       email: r.email,
       name: nameMap.get(r.email) ?? '',
       totalDocuments: r._count.id,

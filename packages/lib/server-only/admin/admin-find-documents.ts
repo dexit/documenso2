@@ -1,4 +1,4 @@
-import { type Prisma } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, type Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -47,9 +47,9 @@ export const adminFindDocuments = async ({
   }
 
   const where: Prisma.EnvelopeWhereInput = {
-    type: 'DOCUMENT' as string,
+    type: EnvelopeType.DOCUMENT,
     ...termFilters,
-    ...(status ? { status: status as string } : {}),
+    ...(status ? { status: DocumentStatus[status] } : {}),
     ...(teamId ? { teamId } : {}),
     ...(ownerEmail ? { user: { email: { contains: ownerEmail, mode: 'insensitive' } } } : {}),
     ...(dateFrom || dateTo

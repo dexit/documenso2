@@ -1,3 +1,4 @@
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -49,7 +50,7 @@ export const getActivityStatsRoute = adminProcedure
         where: { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED },
       }),
       prisma.envelope.count({
-        where: { type: 'DOCUMENT' as string, status: 'PENDING' as string },
+        where: { type: EnvelopeType.DOCUMENT, status: DocumentStatus.PENDING },
       }),
       prisma.documentAuditLog.count({
         where: { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED },

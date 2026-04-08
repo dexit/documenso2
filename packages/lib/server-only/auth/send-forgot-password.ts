@@ -58,7 +58,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
     recipientEmail: user.email,
     recipientName: user.name ?? null,
     subject,
-    metadata: { userId },
+    userId,
   });
 
   return await mailer.sendMail({

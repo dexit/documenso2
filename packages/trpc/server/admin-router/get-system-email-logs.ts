@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { getSystemEmailLogs } from '@documenso/lib/server-only/system-email-log/store';
+import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
 
@@ -15,14 +15,34 @@ export const getSystemEmailLogsRoute = adminProcedure
       emailFilter: z.string().optional(),
     }),
   )
-  .query(({ input }) => {
-    const result = getSystemEmailLogs(input);
+  .query(async ({ input }) => {
+    const { page, perPage, type, emailFilter } = input;
+
+    const where = {
+      ...(type ? { type } : {}),
+      ...(emailFilter
+        ? { recipientEmail: { contains: emailFilter, mode: 'insensitive' as const } }
+        : {}),
+    };
+
+    const [entries, total] = await Promise.all([
+      prisma.systemEmailLog.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * perPage,
+        take: perPage,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+        },
+      }),
+      prisma.systemEmailLog.count({ where }),
+    ]);
 
     return {
-      entries: result.entries,
-      total: result.total,
-      currentPage: input.page,
-      perPage: input.perPage,
-      totalPages: Math.max(1, Math.ceil(result.total / input.perPage)),
+      entries,
+      total,
+      currentPage: page,
+      perPage,
+      totalPages: Math.max(1, Math.ceil(total / perPage)),
     };
   });

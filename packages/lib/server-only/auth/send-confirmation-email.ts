@@ -65,7 +65,8 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     recipientEmail: user.email,
     recipientName: user.name ?? null,
     subject,
-    metadata: { userId, confirmationLink },
+    userId,
+    metadata: { confirmationLink },
   });
 
   return mailer.sendMail({

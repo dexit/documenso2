@@ -73,6 +73,7 @@ model User {
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  systemEmailLogs    SystemEmailLog[]
 
   @@index([email])
 }
@@ -481,6 +482,24 @@ model DocumentAuditLog {
   envelope Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
   @@index([envelopeId])
+}
+
+model SystemEmailLog {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  type           String
+  recipientEmail String
+  recipientName  String?
+  subject        String
+  metadata       Json     @default("{}")
+
+  // Optionally link to a user account
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([recipientEmail])
+  @@index([type])
 }
 
 enum DocumentDataType {

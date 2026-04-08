@@ -4869,6 +4869,10 @@ msgid "Email the owner when a document is created from a direct template"
 msgstr "Email the owner when a document is created from a direct template"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when a document is created from a direct template"
+msgstr "Email the owner when a document is created from a direct template"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a recipient signs"
 msgstr "Email the owner when a recipient signs"
 

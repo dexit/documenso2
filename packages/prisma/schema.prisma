@@ -467,7 +467,7 @@ model EnvelopeItem {
 
 model DocumentAuditLog {
   id         String   @id @default(cuid())
-  envelopeId String
+  envelopeId String?
   createdAt  DateTime @default(now())
   type       String
   data       Json
@@ -479,7 +479,7 @@ model DocumentAuditLog {
   userAgent String?
   ipAddress String?
 
-  envelope Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  envelope Envelope? @relation(fields: [envelopeId], references: [id], onDelete: SetNull)
 
   @@index([envelopeId])
 }

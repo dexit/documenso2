@@ -6,7 +6,6 @@ import { Trans } from '@lingui/react/macro';
 import { MailIcon, UserPlusIcon } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { trpc } from '@documenso/trpc/react';
 import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -33,8 +32,6 @@ const TYPE_LABELS: Record<string, string> = {
 
 function SystemEmailsPanel() {
   const { _ } = useLingui();
-  const updateSearchParams = useUpdateSearchParams();
-
   const [emailFilter, setEmailFilter] = useState('');
   const [page, setPage] = useState(1);
   const perPage = 50;
@@ -53,10 +50,10 @@ function SystemEmailsPanel() {
       [
         {
           header: _(msg`Sent At`),
-          accessorKey: 'sentAt',
+          accessorKey: 'createdAt',
           cell: ({ row }) => (
             <span className="whitespace-nowrap text-xs text-muted-foreground">
-              {new Date(row.original.sentAt).toLocaleString()}
+              {new Date(row.original.createdAt).toLocaleString()}
             </span>
           ),
         },

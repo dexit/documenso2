@@ -606,6 +606,11 @@ export const formatDocumentAuditLogAction = (
         user: message,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED }, () => ({
+      anonymous: msg({ message: 'An email was opened', context: 'Audit log format' }),
+      you: msg`You opened an email`,
+      user: msg`${user} opened an email`,
+    }))
     .exhaustive();
 
   let selectedDescription = description.anonymous;

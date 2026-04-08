@@ -34,11 +34,7 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { appMetaTags } from '~/utils/meta';
 
@@ -53,7 +49,12 @@ type StatCardProps = {
   colorClass?: string;
 };
 
-function StatCard({ icon, label, value, colorClass = 'bg-blue-100 dark:bg-blue-900/30' }: StatCardProps) {
+function StatCard({
+  icon,
+  label,
+  value,
+  colorClass = 'bg-blue-100 dark:bg-blue-900/30',
+}: StatCardProps) {
   return (
     <div className="flex items-start gap-3 rounded-lg border bg-card p-4">
       <div className={`rounded-full p-2 ${colorClass}`}>{icon}</div>
@@ -82,8 +83,6 @@ export default function AdminHttpMonitorPage() {
   const [blockType, setBlockType] = useState<'exact' | 'prefix' | 'contains'>('exact');
   const [blockReason, setBlockReason] = useState('');
 
-  const utils = trpc.useUtils();
-
   const { data, isLoading } = trpc.admin.httpMonitor.get.useQuery(
     {
       page,
@@ -94,10 +93,8 @@ export default function AdminHttpMonitorPage() {
     { refetchInterval: 15_000, placeholderData: (prev) => prev },
   );
 
-  const { data: blockList = [], refetch: refetchBlockList } = trpc.admin.httpMonitor.blockList.useQuery(
-    undefined,
-    { refetchInterval: 30_000 },
-  );
+  const { data: blockList = [], refetch: refetchBlockList } =
+    trpc.admin.httpMonitor.blockList.useQuery(undefined, { refetchInterval: 30_000 });
 
   const addBlock = trpc.admin.httpMonitor.addBlock.useMutation({
     onSuccess: () => {
@@ -167,13 +164,17 @@ export default function AdminHttpMonitorPage() {
         header: _(msg`User Agent`),
         accessorKey: 'userAgent',
         cell: ({ row }) => {
-          const isBot = /bot|crawler|spider|curl|wget|python|zgrab|masscan|nuclei|sqlmap|dirbuster|gobuster|ffuf/i.test(
-            row.original.userAgent,
-          );
+          const isBot =
+            /bot|crawler|spider|curl|wget|python|zgrab|masscan|nuclei|sqlmap|dirbuster|gobuster|ffuf/i.test(
+              row.original.userAgent,
+            );
           return (
             <div className="flex max-w-[200px] items-center gap-1">
               {isBot && <BotIcon className="h-3 w-3 shrink-0 text-destructive" />}
-              <span className="truncate text-xs text-muted-foreground" title={row.original.userAgent}>
+              <span
+                className="truncate text-xs text-muted-foreground"
+                title={row.original.userAgent}
+              >
                 {row.original.userAgent || '—'}
               </span>
             </div>
@@ -184,7 +185,10 @@ export default function AdminHttpMonitorPage() {
         header: _(msg`Referer`),
         accessorKey: 'referer',
         cell: ({ row }) => (
-          <span className="max-w-[150px] truncate text-xs text-muted-foreground" title={row.original.referer ?? ''}>
+          <span
+            className="max-w-[150px] truncate text-xs text-muted-foreground"
+            title={row.original.referer ?? ''}
+          >
             {row.original.referer ?? '—'}
           </span>
         ),
@@ -230,8 +234,8 @@ export default function AdminHttpMonitorPage() {
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           <Trans>
-            Live tracking of 4xx/5xx errors, bot probes, and requests to non-existent routes. Resets on
-            server restart. Up to 2,000 entries stored in memory.
+            Live tracking of 4xx/5xx errors, bot probes, and requests to non-existent routes. Resets
+            on server restart. Up to 2,000 entries stored in memory.
           </Trans>
         </p>
       </div>
@@ -275,19 +279,23 @@ export default function AdminHttpMonitorPage() {
             </p>
             <div className="space-y-1.5">
               {stats.topPaths.length === 0 ? (
-                <p className="text-xs text-muted-foreground"><Trans>No data yet</Trans></p>
+                <p className="text-xs text-muted-foreground">
+                  <Trans>No data yet</Trans>
+                </p>
               ) : (
                 stats.topPaths.map(({ path, count }) => (
                   <div key={path} className="flex items-center justify-between gap-2">
                     <button
-                      className="max-w-[160px] truncate font-mono text-xs text-primary hover:underline text-left"
+                      className="max-w-[160px] truncate text-left font-mono text-xs text-primary hover:underline"
                       title={path}
                       onClick={() => updateSearchParams({ path, page: 1 })}
                     >
                       {path}
                     </button>
                     <div className="flex shrink-0 items-center gap-1">
-                      <Badge variant="secondary" className="text-xs">{count}</Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {count}
+                      </Badge>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -295,13 +303,19 @@ export default function AdminHttpMonitorPage() {
                             size="sm"
                             className="h-5 px-1 text-destructive hover:bg-destructive/10"
                             onClick={() =>
-                              addBlock.mutate({ pattern: path, type: 'exact', reason: 'Blocked from top paths panel' })
+                              addBlock.mutate({
+                                pattern: path,
+                                type: 'exact',
+                                reason: 'Blocked from top paths panel',
+                              })
                             }
                           >
                             <BanIcon className="h-3 w-3" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent><Trans>Block</Trans></TooltipContent>
+                        <TooltipContent>
+                          <Trans>Block</Trans>
+                        </TooltipContent>
                       </Tooltip>
                     </div>
                   </div>
@@ -318,7 +332,9 @@ export default function AdminHttpMonitorPage() {
             </p>
             <div className="space-y-1.5">
               {stats.topIPs.length === 0 ? (
-                <p className="text-xs text-muted-foreground"><Trans>No data yet</Trans></p>
+                <p className="text-xs text-muted-foreground">
+                  <Trans>No data yet</Trans>
+                </p>
               ) : (
                 stats.topIPs.map(({ ip, count, isSuspicious }) => (
                   <div key={ip} className="flex items-center justify-between gap-2">
@@ -326,10 +342,15 @@ export default function AdminHttpMonitorPage() {
                       className="flex items-center gap-1 font-mono text-xs text-primary hover:underline"
                       onClick={() => updateSearchParams({ ip, page: 1 })}
                     >
-                      {isSuspicious && <ShieldAlertIcon className="h-3 w-3 shrink-0 text-destructive" />}
+                      {isSuspicious && (
+                        <ShieldAlertIcon className="h-3 w-3 shrink-0 text-destructive" />
+                      )}
                       {ip}
                     </button>
-                    <Badge variant={isSuspicious ? 'destructive' : 'secondary'} className="shrink-0 text-xs">
+                    <Badge
+                      variant={isSuspicious ? 'destructive' : 'secondary'}
+                      className="shrink-0 text-xs"
+                    >
                       {count}
                     </Badge>
                   </div>
@@ -346,17 +367,25 @@ export default function AdminHttpMonitorPage() {
             </p>
             <div className="space-y-1.5">
               {stats.topUserAgents.length === 0 ? (
-                <p className="text-xs text-muted-foreground"><Trans>No data yet</Trans></p>
+                <p className="text-xs text-muted-foreground">
+                  <Trans>No data yet</Trans>
+                </p>
               ) : (
                 stats.topUserAgents.map(({ userAgent, count, isBot }) => (
                   <div key={userAgent} className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-1">
                       {isBot && <BotIcon className="h-3 w-3 shrink-0 text-destructive" />}
-                      <span className="max-w-[170px] truncate text-xs text-muted-foreground" title={userAgent}>
+                      <span
+                        className="max-w-[170px] truncate text-xs text-muted-foreground"
+                        title={userAgent}
+                      >
                         {userAgent || '(empty)'}
                       </span>
                     </div>
-                    <Badge variant={isBot ? 'destructive' : 'secondary'} className="shrink-0 text-xs">
+                    <Badge
+                      variant={isBot ? 'destructive' : 'secondary'}
+                      className="shrink-0 text-xs"
+                    >
                       {count}
                     </Badge>
                   </div>
@@ -373,7 +402,9 @@ export default function AdminHttpMonitorPage() {
           <ShieldOffIcon className="h-4 w-4 text-destructive" />
           <Trans>Block list</Trans>
           {blockList.length > 0 && (
-            <Badge variant="destructive" className="text-xs">{blockList.length}</Badge>
+            <Badge variant="destructive" className="text-xs">
+              {blockList.length}
+            </Badge>
           )}
         </p>
         <p className="mb-4 text-xs text-muted-foreground">
@@ -396,9 +427,15 @@ export default function AdminHttpMonitorPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="exact"><Trans>Exact</Trans></SelectItem>
-              <SelectItem value="prefix"><Trans>Prefix</Trans></SelectItem>
-              <SelectItem value="contains"><Trans>Contains</Trans></SelectItem>
+              <SelectItem value="exact">
+                <Trans>Exact</Trans>
+              </SelectItem>
+              <SelectItem value="prefix">
+                <Trans>Prefix</Trans>
+              </SelectItem>
+              <SelectItem value="contains">
+                <Trans>Contains</Trans>
+              </SelectItem>
             </SelectContent>
           </Select>
           <Input
@@ -426,14 +463,21 @@ export default function AdminHttpMonitorPage() {
 
         {/* Current block list */}
         {blockList.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic"><Trans>No patterns blocked yet.</Trans></p>
+          <p className="text-xs italic text-muted-foreground">
+            <Trans>No patterns blocked yet.</Trans>
+          </p>
         ) : (
           <div className="divide-y rounded-md border">
             {blockList.map((entry) => (
-              <div key={`${entry.type}:${entry.pattern}`} className="flex items-center justify-between gap-3 px-3 py-2">
+              <div
+                key={`${entry.type}:${entry.pattern}`}
+                className="flex items-center justify-between gap-3 px-3 py-2"
+              >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="shrink-0 font-mono text-xs">{entry.type}</Badge>
+                    <Badge variant="secondary" className="shrink-0 font-mono text-xs">
+                      {entry.type}
+                    </Badge>
                     <span className="truncate font-mono text-xs font-medium">{entry.pattern}</span>
                   </div>
                   {entry.reason && (
@@ -491,7 +535,9 @@ export default function AdminHttpMonitorPage() {
           component: (
             <>
               {Array.from({ length: 8 }).map((_, i) => (
-                <TableCell key={i}><Skeleton className="h-4 w-24 rounded" /></TableCell>
+                <TableCell key={i}>
+                  <Skeleton className="h-4 w-24 rounded" />
+                </TableCell>
               ))}
             </>
           ),

@@ -1,12 +1,10 @@
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { parseDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZFindAllActivityLogsRequestSchema,
-} from './find-all-activity-logs.types';
+import { ZFindAllActivityLogsRequestSchema } from './find-all-activity-logs.types';
 
 export const findAllActivityLogsRoute = adminProcedure
   .input(ZFindAllActivityLogsRequestSchema)
@@ -73,8 +71,18 @@ export const findAllActivityLogsRoute = adminProcedure
       prisma.documentAuditLog.count({ where }),
     ]);
 
-    type EnvelopeInfo = { id: string; title: string; secondaryId: string; userId: number; teamId: number | null; team: { id: number; name: string } | null } | null;
-    type ParsedEntry = { parsed: ReturnType<typeof parseDocumentAuditLogData>; envelope: EnvelopeInfo };
+    type EnvelopeInfo = {
+      id: string;
+      title: string;
+      secondaryId: string;
+      userId: number;
+      teamId: number | null;
+      team: { id: number; name: string } | null;
+    } | null;
+    type ParsedEntry = {
+      parsed: ReturnType<typeof parseDocumentAuditLogData>;
+      envelope: EnvelopeInfo;
+    };
 
     const parsedLogs: ParsedEntry[] = (data as Array<Record<string, unknown>>).map((row) => {
       const { envelope, ...log } = row as { envelope: EnvelopeInfo } & Record<string, unknown>;
@@ -82,19 +90,25 @@ export const findAllActivityLogsRoute = adminProcedure
       try {
         parsed = parseDocumentAuditLogData(log as Parameters<typeof parseDocumentAuditLogData>[0]);
       } catch {
-        // Return a safe fallback for logs that fail schema validation (e.g. older format entries)
-        parsed = {
+        // Return a safe fallback for logs that fail schema validation (e.g. older format entries).
+        const fallback = {
           id: String(log.id ?? ''),
           envelopeId: String(log.envelopeId ?? ''),
-          createdAt: log.createdAt instanceof Date ? log.createdAt : new Date(String(log.createdAt ?? Date.now())),
-          type: String(log.type ?? 'UNKNOWN') as Parameters<typeof parseDocumentAuditLogData>[0]['type'],
+          createdAt:
+            log.createdAt instanceof Date
+              ? log.createdAt
+              : new Date(String(log.createdAt ?? Date.now())),
+          type: String(log.type ?? 'UNKNOWN'),
           name: log.name != null ? String(log.name) : null,
           email: log.email != null ? String(log.email) : null,
           userId: log.userId != null ? Number(log.userId) : null,
           userAgent: log.userAgent != null ? String(log.userAgent) : null,
           ipAddress: log.ipAddress != null ? String(log.ipAddress) : null,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           data: (log.data ?? {}) as ReturnType<typeof parseDocumentAuditLogData>['data'],
         };
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        parsed = fallback as unknown as ReturnType<typeof parseDocumentAuditLogData>;
       }
       return { parsed, envelope: envelope ?? null };
     });
@@ -118,7 +132,9 @@ export const findAllActivityLogsRoute = adminProcedure
         where: { id: { in: recipientIds } },
         select: { id: true, token: true, signingStatus: true },
       });
-      (recipients as Array<{ id: number; token: string; signingStatus: string }>).forEach((r) => recipientMap.set(r.id, r));
+      (recipients as Array<{ id: number; token: string; signingStatus: string }>).forEach((r) =>
+        recipientMap.set(r.id, r),
+      );
     }
 
     const result = parsedLogs.map(({ parsed, envelope }: ParsedEntry) => {

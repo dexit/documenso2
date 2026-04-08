@@ -21,7 +21,7 @@ x-documenso-env: &documenso-env
   # Storage — Minio (S3 compatible)
   NEXT_PUBLIC_UPLOAD_TRANSPORT: s3
   NEXT_PRIVATE_UPLOAD_ENDPOINT: http://minio:9000
-  NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: "true"
+  NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: 'true'
   NEXT_PRIVATE_UPLOAD_REGION: ${NEXT_PRIVATE_UPLOAD_REGION:-us-east-1}
   NEXT_PRIVATE_UPLOAD_BUCKET: ${NEXT_PRIVATE_UPLOAD_BUCKET:-documenso}
   NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-documenso}
@@ -61,8 +61,9 @@ x-documenso-env: &documenso-env
   NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET:-}
   NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT:-50}
 
-
 services:
+  # ── Infrastructure ─────────────────────────────────────────────────────────
+
   # ─── PostgreSQL ─────────────────────────────────────────────────────────────
   database:
     image: postgres:15-alpine
@@ -75,12 +76,12 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-documenso}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-documenso}']
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - documenso-internal
+      - internal # DB never exposed to outside — accessed via container name
 
   # ─── Redis (BullMQ backend) ──────────────────────────────────────────────────
   redis:
@@ -91,12 +92,12 @@ services:
     volumes:
       - redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - documenso-internal
+      - internal
 
   # ─── Minio (S3-compatible object storage) ───────────────────────────────────
   minio:
@@ -107,24 +108,23 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-documenso}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
+      # Tell Minio its public console URL (used for redirects in the UI)
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_CONSOLE_URL:-http://localhost:9001}
     volumes:
       - minio:/data
-    ports:
-      - "9001:9001"   # Minio Console UI — access at http://<host>:9001
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ['CMD', 'mc', 'ready', 'local']
       interval: 30s
       timeout: 10s
       retries: 5
     networks:
-      - documenso-internal
-      - documenso-public
+      - internal # Port 9000 (S3 API) and 9001 (console) accessible inside
 
   # ─── Minio bucket initializer (one-shot) ────────────────────────────────────
   minio-init:
     image: minio/mc:latest
     container_name: documenso-minio-init
-    restart: "no"
+    restart: 'no'
     depends_on:
       minio:
         condition: service_healthy
@@ -140,27 +140,9 @@ services:
         echo 'Minio bucket ready';
       "
     networks:
-      - documenso-internal
+      - internal
 
-  # ─── Inngest Dev Server (local job runner — optional) ───────────────────────
-  #
-  # Only used when NEXT_PRIVATE_JOBS_PROVIDER=inngest.
-  # Remove this block if you are using BullMQ (the default).
-  #
-  inngest:
-    image: inngest/inngest:latest
-    container_name: documenso-inngest
-    restart: unless-stopped
-    command: inngest dev --host 0.0.0.0 --port 8288 --no-discovery
-    ports:
-      - "8288:8288"   # Inngest Dev UI — http://<host>:8288
-    environment:
-      INNGEST_DEV: "1"
-    networks:
-      - documenso-internal
-      - documenso-public
-    profiles:
-      - inngest   # Only started with: docker compose --profile inngest up
+  # ── Application ────────────────────────────────────────────────────────────
 
   # ─── Documenso App ──────────────────────────────────────────────────────────
   documenso:
@@ -181,25 +163,20 @@ services:
     volumes:
       - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
     expose:
-      - "${PORT:-3000}"
+      - '${PORT:-3000}' # Only reachable inside Docker — NPM proxies from outside
     networks:
-      - documenso-internal
-      - documenso-public
+      - internal
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:${PORT:-3000}/api/health || exit 1"]
+      test: ['CMD-SHELL', 'curl -sf http://localhost:${PORT:-3000}/api/health || exit 1']
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
 
-  # ─── BullMQ Worker ──────────────────────────────────────────────────────────
+  # ─── BullMQ Worker (optional) ───────────────────────────────────────────────
   #
-  # Runs background jobs (document processing, emails, webhooks).
-  # Uses the same image as the app — started with `npm run worker` (or the
-  # Dockerfile CMD if a separate worker entrypoint is defined).
+  # Start with: docker compose --profile worker up -d
   #
-  # Note: If your Dockerfile only exposes one entrypoint (the web server),
-  # override the command here to run the worker process instead.
   worker:
     build:
       context: .
@@ -213,44 +190,141 @@ services:
         condition: service_healthy
     environment:
       <<: *documenso-env
-      # Override so this container only runs the worker
-      WORKER_ONLY: "true"
-    command: ["node", "worker.js"]
+      WORKER_ONLY: 'true'
+    command: ['node', 'worker.js']
     volumes:
       - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
     networks:
-      - documenso-internal
+      - internal
     profiles:
-      - worker   # Only started with: docker compose --profile worker up
+      - worker
+
+  # ─── Inngest Dev Server (optional) ──────────────────────────────────────────
+  #
+  # Only when NEXT_PRIVATE_JOBS_PROVIDER=inngest.
+  # Start with: docker compose --profile inngest up -d
+  #
+  inngest:
+    image: inngest/inngest:latest
+    container_name: documenso-inngest
+    restart: unless-stopped
+    command: inngest dev --host 0.0.0.0 --port 8288 --no-discovery
+    expose:
+      - '8288'
+    environment:
+      INNGEST_DEV: '1'
+    networks:
+      - internal
+    profiles:
+      - inngest
+
+  # ── Proxy & Ingress ────────────────────────────────────────────────────────
 
   # ─── Nginx Proxy Manager ────────────────────────────────────────────────────
   #
-  # Admin UI:   http://<host>:81   (default login: admin@example.com / changeme)
-  # HTTP:       port 80  (also used for Let's Encrypt HTTP-01 challenge)
-  # HTTPS:      port 443 (SSL termination — configure domains in the NPM UI)
+  # The single ingress point for all HTTP/HTTPS traffic.
+  # On first boot the npm-init service will auto-create proxy hosts.
+  #
+  # Admin UI:  http://<host>:81
+  #   First-boot login: NPM_ADMIN_EMAIL / NPM_ADMIN_PASSWORD (see .env)
+  #   Default fallback: admin@example.com / changeme
+  #
+  # Ports exposed to the host:
+  #   80  → HTTP (Let's Encrypt HTTP-01 challenge + redirect to HTTPS)
+  #   443 → HTTPS (SSL termination)
+  #   81  → NPM Admin UI (consider firewalling this in production)
   #
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: documenso-nginx
     restart: unless-stopped
-    depends_on:
-      documenso:
-        condition: service_healthy
     ports:
-      - "80:80"     # HTTP → redirect to HTTPS / Let's Encrypt challenge
-      - "443:443"   # HTTPS — SSL terminated here, proxied to documenso:3000
-      - "81:81"     # NPM Admin UI
+      - '80:80'
+      - '443:443'
+      - '81:81'
     volumes:
       - npm-data:/data
       - npm-letsencrypt:/etc/letsencrypt
     healthcheck:
-      test: ["CMD", "/usr/bin/check-health"]
+      test: ['CMD', '/usr/bin/check-health']
       interval: 10s
       timeout: 3s
-      retries: 5
+      retries: 10
+      start_period: 30s
     networks:
-      - documenso-public
+      - internal # Can reach all backend services by container name
+      - public # Faces the host/internet
 
+  # ─── Nginx Proxy Manager — auto-configuration (one-shot) ────────────────────
+  #
+  # Runs once after NPM is healthy and seeds it with proxy hosts for:
+  #   DOCUMENSO_DOMAIN → documenso:3000
+  #   MINIO_DOMAIN     → minio:9001 (console)
+  #   STATUS_DOMAIN    → uptime-kuma:3001
+  #   NPM_DOMAIN       → nginx-proxy-manager:81 (admin on a clean domain)
+  #
+  # Leave a domain blank in .env to skip creating that proxy host.
+  # This container exits after first run — re-run with: docker compose run npm-init
+  #
+  npm-init:
+    image: alpine/curl:latest
+    container_name: documenso-npm-init
+    restart: 'no'
+    depends_on:
+      nginx-proxy-manager:
+        condition: service_healthy
+    environment:
+      NPM_ADMIN_EMAIL: ${NPM_ADMIN_EMAIL:-admin@example.com}
+      NPM_ADMIN_PASSWORD: ${NPM_ADMIN_PASSWORD:-changeme}
+      PORT: ${PORT:-3000}
+      DOCUMENSO_DOMAIN: ${DOCUMENSO_DOMAIN:-}
+      MINIO_DOMAIN: ${MINIO_DOMAIN:-}
+      STATUS_DOMAIN: ${STATUS_DOMAIN:-}
+      NPM_DOMAIN: ${NPM_DOMAIN:-}
+    volumes:
+      - ./docker/npm-init.sh:/npm-init.sh:ro
+    entrypoint: ['/bin/sh', '/npm-init.sh']
+    networks:
+      - internal
+
+  # ── Monitoring ─────────────────────────────────────────────────────────────
+
+  # ─── Uptime Kuma ────────────────────────────────────────────────────────────
+  #
+  # Service health monitoring — similar to Checkmate / Uptime Robot.
+  # Monitors HTTP endpoints, TCP ports, Docker container states, and more.
+  #
+  # Access via:  http://<host>:3001  (direct)
+  #              https://STATUS_DOMAIN (through NPM — configured by npm-init)
+  #
+  # On first boot: create an admin account at the web UI.
+  #
+  # Pre-configured monitors (set up in the UI after first boot):
+  #   • Documenso health  → http://documenso:3000/api/health
+  #   • Minio S3 API      → http://minio:9000/minio/health/live
+  #   • Redis             → TCP redis:6379
+  #   • PostgreSQL        → TCP database:5432
+  #   • NPM               → http://nginx-proxy-manager:81/api/
+  #
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: documenso-uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime-kuma:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Docker container monitoring
+    expose:
+      - '3001' # Proxied through NPM — direct port exposed below for initial setup
+    ports:
+      - '3001:3001' # Remove this after NPM is configured with STATUS_DOMAIN
+    networks:
+      - internal # Can reach all services for health checks
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -sf http://localhost:3001 || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   database:
@@ -258,11 +332,14 @@ volumes:
   minio:
   npm-data:
   npm-letsencrypt:
+  uptime-kuma:
 
 networks:
-  # Internal only — database, redis, minio ↔ app (not reachable from outside)
-  documenso-internal:
+  # Internal — all services communicate here; never directly exposed to host
+  internal:
     driver: bridge
-  # Public — nginx proxy manager ↔ app (and minio console)
-  documenso-public:
+    internal: false # Set to true if you want strict isolation (breaks Let's Encrypt)
+
+  # Public — only NPM sits here; it bridges to internal services
+  public:
     driver: bridge

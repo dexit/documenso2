@@ -519,6 +519,10 @@ msgid "{user} moved the document to team"
 msgstr "{user} 已将该文档移动到团队"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{user} opened an email"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{user} opened the document"
 msgstr "{user} 打开了该文档"
 
@@ -1290,6 +1294,10 @@ msgstr "添加另一个值"
 msgid "Add Attachment"
 msgstr "添加附件"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Add block"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add Custom Email Domain"
 msgstr "添加自定义邮箱域名"
@@ -1552,7 +1560,7 @@ msgid "All items must be of the same type."
 msgstr "所有项目必须为同一类型。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
-msgid "All outbound emails with open-tracking. Resend any email from the actions column."
+msgid "All outbound emails. Document emails include open-tracking and resend actions."
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/recipients._index.tsx
@@ -1673,6 +1681,11 @@ msgstr "一个邮箱账号"
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "An email containing an invitation will be sent to each member."
 msgstr "每位成员都会收到一封包含邀请的邮件。"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "An email was opened"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "An email with this address already exists."
@@ -2286,13 +2299,22 @@ msgstr "账单"
 msgid "Black"
 msgstr "黑色"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block list"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block this path"
+msgstr ""
+
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Blue"
 msgstr "蓝色"
-
-#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Bot UAs detected"
-msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
@@ -2969,6 +2991,10 @@ msgstr "在此联系销售"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Contact us"
 msgstr "联系我们"
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Contains"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Content"
@@ -4118,6 +4144,10 @@ msgstr "文档已复制"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Document Editor"
 msgstr "文档编辑器"
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Document emails"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -5289,6 +5319,10 @@ msgstr "所有人都已签署"
 msgid "Everyone has signed! You will receive an email copy of the signed document."
 msgstr "所有人都已签署！您将收到一份已签署文档的电子邮件副本。"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Exact"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
 msgstr "超时"
@@ -5574,6 +5608,10 @@ msgstr "文件大小超过 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB 限制"
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "填写详细信息以创建新的订阅声明。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Filter by email..."
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
 msgid "Filter by email…"
@@ -6582,7 +6620,7 @@ msgid "Listening to"
 msgstr "监听对象"
 
 #: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Live tracking of 404s, bot probes, and requests to non-existent routes. Resets on server restart. Up to 2,000 entries stored in memory."
+msgid "Live tracking of 4xx/5xx errors, bot probes, and requests to non-existent routes. Resets on server restart. Up to 2,000 entries stored in memory."
 msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
@@ -7220,6 +7258,10 @@ msgstr "目前还没有与您的团队共享的组织模板。"
 msgid "No organisations found"
 msgstr "未找到组织"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "No patterns blocked yet."
+msgstr ""
+
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
 msgstr "未找到公开资料模板"
@@ -7826,6 +7868,14 @@ msgstr "逾期"
 msgid "Path"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Paths matching a blocked pattern will receive a 403 response and be logged. Add patterns by clicking \"Block\" on a log row, or manually below."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Pattern (e.g. /wp-login.php)"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Payment overdue"
@@ -8197,6 +8247,10 @@ msgstr "带示例数据的预格式化 CSV 模板。"
 msgid "Preferences"
 msgstr "偏好设置"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Prefix"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview"
@@ -8389,6 +8443,10 @@ msgstr "就绪"
 msgid "Reason"
 msgstr "原因"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Reason (optional)"
+msgstr ""
+
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "Reason for cancellation: {cancellationReason}"
 msgstr "取消原因：{cancellationReason}"
@@ -8429,6 +8487,7 @@ msgstr "最近文档"
 #: apps/remix/app/components/tables/admin-recipient-stats-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Recipient"
 msgstr "收件人"
 
@@ -9470,6 +9529,7 @@ msgid "Sent"
 msgstr "已发送"
 
 #: apps/remix/app/components/tables/admin-emails-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Sent At"
 msgstr ""
 
@@ -9835,6 +9895,10 @@ msgstr "{displayName} 在“{documentName}”的签署时间窗口已过期"
 msgid "Signing window expired for {0}"
 msgstr "{0} 的签署时间窗口已过期"
 
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Signup confirmations and password reset emails. Stored in-memory — resets on server restart."
+msgstr ""
+
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
 msgstr "当前已禁用注册，或您的电子邮箱域名不支持注册。"
@@ -10070,6 +10134,7 @@ msgstr "已卡住时长"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Subject"
 msgstr "主题"
 
@@ -10241,6 +10306,10 @@ msgstr "从服务器同步许可证"
 msgctxt "Audit log format"
 msgid "System auto inserted fields"
 msgstr "系统自动插入了字段"
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "System emails"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "System Requirements"
@@ -11567,7 +11636,11 @@ msgid "Total"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Total 404s"
+msgid "Total 4xx errors"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Total 5xx errors"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
@@ -11645,6 +11718,7 @@ msgstr "双重验证重新验证"
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Type"
 msgstr "类型"
 
@@ -13629,6 +13703,10 @@ msgstr "您需要设置通行密钥 (passkey) 才能查看此文档。"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to view this field."
 msgstr "您需要设置通行密钥 (passkey) 才能查看此字段。"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You opened an email"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You opened the document"

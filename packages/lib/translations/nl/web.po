@@ -519,6 +519,10 @@ msgid "{user} moved the document to team"
 msgstr "{user} heeft het document naar het team verplaatst"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{user} opened an email"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{user} opened the document"
 msgstr "{user} heeft het document geopend"
 
@@ -1290,6 +1294,10 @@ msgstr "Nog een waarde toevoegen"
 msgid "Add Attachment"
 msgstr "Bijlage toevoegen"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Add block"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add Custom Email Domain"
 msgstr "Aangepast e-maildomein toevoegen"
@@ -1552,7 +1560,7 @@ msgid "All items must be of the same type."
 msgstr "Alle items moeten van hetzelfde type zijn."
 
 #: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
-msgid "All outbound emails with open-tracking. Resend any email from the actions column."
+msgid "All outbound emails. Document emails include open-tracking and resend actions."
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/recipients._index.tsx
@@ -1673,6 +1681,11 @@ msgstr "Een e‑mailaccount"
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "An email containing an invitation will be sent to each member."
 msgstr "Naar elk lid wordt een e‑mail met een uitnodiging gestuurd."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "An email was opened"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "An email with this address already exists."
@@ -2286,13 +2299,22 @@ msgstr "Facturatie"
 msgid "Black"
 msgstr "Zwart"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block list"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Block this path"
+msgstr ""
+
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Blue"
 msgstr "Blauw"
-
-#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Bot UAs detected"
-msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
@@ -2969,6 +2991,10 @@ msgstr "Neem hier contact op met sales"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Contact us"
 msgstr "Neem contact met ons op"
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Contains"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Content"
@@ -4118,6 +4144,10 @@ msgstr "Document gedupliceerd"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Document Editor"
 msgstr "Documenteditor"
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Document emails"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -5289,6 +5319,10 @@ msgstr "Iedereen heeft getekend"
 msgid "Everyone has signed! You will receive an email copy of the signed document."
 msgstr "Iedereen heeft ondertekend! U ontvangt een kopie van het ondertekende document per e-mail."
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Exact"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
 msgstr "Time‑out overschreden"
@@ -5574,6 +5608,10 @@ msgstr "Bestandsgrootte overschrijdt de limiet van {APP_DOCUMENT_UPLOAD_SIZE_LIM
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "Vul de gegevens in om een nieuwe abonnementsclaim aan te maken."
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Filter by email..."
+msgstr ""
 
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
 msgid "Filter by email…"
@@ -6582,7 +6620,7 @@ msgid "Listening to"
 msgstr "Luistert naar"
 
 #: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Live tracking of 404s, bot probes, and requests to non-existent routes. Resets on server restart. Up to 2,000 entries stored in memory."
+msgid "Live tracking of 4xx/5xx errors, bot probes, and requests to non-existent routes. Resets on server restart. Up to 2,000 entries stored in memory."
 msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
@@ -7220,6 +7258,10 @@ msgstr "Er worden nog geen organisatiesjablonen met je team gedeeld."
 msgid "No organisations found"
 msgstr "Geen organisaties gevonden"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "No patterns blocked yet."
+msgstr ""
+
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
 msgstr "Geen openbare profielsjablonen gevonden"
@@ -7826,6 +7868,14 @@ msgstr "Achterstallig"
 msgid "Path"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Paths matching a blocked pattern will receive a 403 response and be logged. Add patterns by clicking \"Block\" on a log row, or manually below."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Pattern (e.g. /wp-login.php)"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Payment overdue"
@@ -8197,6 +8247,10 @@ msgstr "Vooraf opgemaakte CSV-sjabloon met voorbeeldgegevens."
 msgid "Preferences"
 msgstr "Voorkeuren"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Prefix"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Preview"
@@ -8389,6 +8443,10 @@ msgstr "Klaar"
 msgid "Reason"
 msgstr "Reden"
 
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Reason (optional)"
+msgstr ""
+
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "Reason for cancellation: {cancellationReason}"
 msgstr "Reden voor annulering: {cancellationReason}"
@@ -8429,6 +8487,7 @@ msgstr "Recente documenten"
 #: apps/remix/app/components/tables/admin-recipient-stats-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Recipient"
 msgstr "Ontvanger"
 
@@ -9470,6 +9529,7 @@ msgid "Sent"
 msgstr "Verzonden"
 
 #: apps/remix/app/components/tables/admin-emails-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Sent At"
 msgstr ""
 
@@ -9835,6 +9895,10 @@ msgstr "Ondertekenvenster verlopen voor \"{displayName}\" voor \"{documentName}\
 msgid "Signing window expired for {0}"
 msgstr "Ondertekenvenster verlopen voor {0}"
 
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "Signup confirmations and password reset emails. Stored in-memory — resets on server restart."
+msgstr ""
+
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
 msgstr "Registratie is momenteel uitgeschakeld of niet beschikbaar voor jouw e‑maildomein."
@@ -10070,6 +10134,7 @@ msgstr "Vast gedurende"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Subject"
 msgstr "Onderwerp"
 
@@ -10241,6 +10306,10 @@ msgstr "Licentie met server synchroniseren"
 msgctxt "Audit log format"
 msgid "System auto inserted fields"
 msgstr "Systeem heeft automatisch velden ingevoegd"
+
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
+msgid "System emails"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "System Requirements"
@@ -11567,7 +11636,11 @@ msgid "Total"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
-msgid "Total 404s"
+msgid "Total 4xx errors"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/http-monitor._index.tsx
+msgid "Total 5xx errors"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
@@ -11645,6 +11718,7 @@ msgstr "Twee‑factor‑herauthenticatie"
 #: apps/remix/app/components/tables/admin-activity-logs-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email._index.tsx
 msgid "Type"
 msgstr "Type"
 
@@ -13629,6 +13703,10 @@ msgstr "Je moet een passkey instellen om dit document te bekijken."
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to view this field."
 msgstr "Je moet een passkey instellen om dit veld te bekijken."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You opened an email"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You opened the document"

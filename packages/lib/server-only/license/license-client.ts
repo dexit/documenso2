@@ -70,6 +70,12 @@ export class LicenseClient {
   }
 
   public async getCachedLicense(): Promise<TCachedLicense | null> {
+    // Super bypass: NEXT_PRIVATE_SUPER_BYPASS_LICENSE=true disables all license checks.
+    const superBypass = env('NEXT_PRIVATE_SUPER_BYPASS_LICENSE');
+    if (superBypass === 'true' || superBypass === '1') {
+      return this.buildBypassLicense('super-bypass');
+    }
+
     if (this.cachedLicense) {
       return this.cachedLicense;
     }
@@ -77,6 +83,35 @@ export class LicenseClient {
     const localLicenseFile = await this.loadFromFile();
 
     return localLicenseFile;
+  }
+
+  /**
+   * Build a fully-enabled bypass license (used for super bypass and org-level bypass).
+   */
+  private buildBypassLicense(licenseKey: string): TCachedLicense {
+    return {
+      lastChecked: new Date().toISOString(),
+      license: {
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        name: 'Bypass License',
+        periodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        cancelAtPeriodEnd: false,
+        licenseKey,
+        flags: {
+          emailDomains: true,
+          embedAuthoring: true,
+          embedAuthoringWhiteLabel: true,
+          cfr21: true,
+          hipaa: true,
+          authenticationPortal: true,
+          billing: true,
+        },
+      },
+      requestedLicenseKey: licenseKey,
+      unauthorizedFlagUsage: false,
+      derivedStatus: 'ACTIVE',
+    };
   }
 
   /**
@@ -89,6 +124,27 @@ export class LicenseClient {
   }
 
   private async initialize(): Promise<void> {
+    // Check if "Pathway Group" organisation exists — if so, bypass license checks.
+    try {
+      const pathwayOrg = await prisma.organisation.findFirst({
+        where: {
+          OR: [
+            { name: 'Pathway Group' },
+            { url: 'pathway-group' },
+          ],
+        },
+        select: { id: true },
+      });
+
+      if (pathwayOrg) {
+        console.log('[License] Pathway Group organisation detected — applying bypass license.');
+        this.cachedLicense = this.buildBypassLicense('pathway-group-bypass');
+        return;
+      }
+    } catch (err) {
+      console.error('[License] Failed to check Pathway Group bypass:', err);
+    }
+
     console.log('[License] Checking license with server...');
 
     const cachedLicense = await this.loadFromFile();

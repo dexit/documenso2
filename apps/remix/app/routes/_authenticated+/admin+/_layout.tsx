@@ -1,15 +1,20 @@
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import {
+  ActivityIcon,
   AlertTriangleIcon,
   BarChart3,
   Building2Icon,
   FileStack,
+  KeyIcon,
   MailIcon,
+  MonitorIcon,
   Settings,
   Trophy,
+  UserCheckIcon,
   Users,
   Wallet2,
+  WebhookIcon,
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
@@ -169,6 +174,104 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Organisation Insights</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/recipients') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/recipients">
+              <UserCheckIcon className="mr-2 h-5 w-5" />
+              <Trans>Recipients</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/webhooks') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/webhooks">
+              <WebhookIcon className="mr-2 h-5 w-5" />
+              <Trans>Webhooks</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/activity-logs') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/activity-logs">
+              <ActivityIcon className="mr-2 h-5 w-5" />
+              <Trans>Activity Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/email' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/email">
+              <MailIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/webhooks' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/webhooks">
+              <WebhookIcon className="mr-2 h-5 w-5" />
+              <Trans>Webhook Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname === '/admin/logs/api-tokens' && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/api-tokens">
+              <KeyIcon className="mr-2 h-5 w-5" />
+              <Trans>API Tokens</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/http-monitor') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/http-monitor">
+              <MonitorIcon className="mr-2 h-5 w-5" />
+              <Trans>HTTP Monitor</Trans>
             </Link>
           </Button>
 

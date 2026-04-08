@@ -1,4 +1,19 @@
 import { router } from '../trpc';
+import { adminResendEmailRoute } from './admin-resend-email';
+import { adminUpdateDocumentMetaRoute } from './admin-update-document-meta';
+import { exportActivityLogsRoute } from './export-activity-logs';
+import { findApiTokensRoute } from './find-api-tokens';
+import { findEmailActivityRoute } from './find-email-activity';
+import { findWebhookLogsRoute } from './find-webhook-logs';
+import { findAdminWebhooksRoute } from './find-admin-webhooks';
+import {
+  addHttpBlockListRoute,
+  getHttpBlockListRoute,
+  getHttpMonitorRoute,
+  removeHttpBlockListRoute,
+} from './get-http-monitor';
+import { getSystemEmailLogsRoute } from './get-system-email-logs';
+import { getActivityStatsRoute } from './get-activity-stats';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -9,12 +24,14 @@ import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
+import { findAllActivityLogsRoute } from './find-all-activity-logs';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
+import { findRecipientStatsRoute } from './find-recipient-stats';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
@@ -66,6 +83,15 @@ export const adminRouter = router({
     resetTwoFactor: resetTwoFactorRoute,
     findTeams: findUserTeamsRoute,
   },
+  httpMonitor: {
+    get: getHttpMonitorRoute,
+    blockList: getHttpBlockListRoute,
+    addBlock: addHttpBlockListRoute,
+    removeBlock: removeHttpBlockListRoute,
+  },
+  systemEmailLogs: {
+    get: getSystemEmailLogsRoute,
+  },
   document: {
     find: findDocumentsRoute,
     findUnsealed: findUnsealedDocumentsRoute,
@@ -74,9 +100,23 @@ export const adminRouter = router({
     findJobs: findDocumentJobsRoute,
     findAuditLogs: findDocumentAuditLogsRoute,
     downloadAuditLogs: downloadDocumentAuditLogsRoute,
+    findAllActivityLogs: findAllActivityLogsRoute,
+    resendEmail: adminResendEmailRoute,
+    updateDocumentMeta: adminUpdateDocumentMetaRoute,
+    exportActivityLogs: exportActivityLogsRoute,
+    findEmailActivity: findEmailActivityRoute,
+    getStats: getActivityStatsRoute,
   },
   recipient: {
     update: updateRecipientRoute,
+    findStats: findRecipientStatsRoute,
+  },
+  webhook: {
+    find: findAdminWebhooksRoute,
+    findLogs: findWebhookLogsRoute,
+  },
+  apiToken: {
+    find: findApiTokensRoute,
   },
   emailDomain: {
     find: findEmailDomainsRoute,

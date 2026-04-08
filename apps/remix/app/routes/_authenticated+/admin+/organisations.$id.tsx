@@ -280,7 +280,7 @@ export default function OrganisationGroupSettingsPage({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
           <DetailsCard label={<Trans>Members</Trans>}>
             <DetailsValue>
               {organisation.members.length} /{' '}
@@ -297,6 +297,10 @@ export default function OrganisationGroupSettingsPage({
                 ? t`Unlimited`
                 : organisation.organisationClaim.teamCount}
             </DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Documents</Trans>}>
+            <DetailsValue>{organisation.documentCount}</DetailsValue>
           </DetailsCard>
         </div>
       </div>

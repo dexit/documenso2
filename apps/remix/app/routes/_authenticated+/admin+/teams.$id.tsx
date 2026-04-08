@@ -181,6 +181,11 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
     <div>
       <SettingsHeader title={_(msg`Manage team`)} subtitle={_(msg`Manage the ${team.name} team`)}>
         <Button variant="outline" asChild>
+          <Link to={`/admin/documents?teamId=${team.id}`}>
+            <Trans>View documents</Trans>
+          </Link>
+        </Button>
+        <Button variant="outline" asChild>
           <Link to={`/admin/organisations/${team.organisation.id}`}>
             <Trans>Manage organisation</Trans>
           </Link>
@@ -226,6 +231,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
 
           <DetailsCard label={<Trans>Members</Trans>}>
             <DetailsValue>{team.memberCount}</DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Documents</Trans>}>
+            <DetailsValue>{team.documentCount}</DetailsValue>
           </DetailsCard>
 
           <DetailsCard

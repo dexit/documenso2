@@ -13,6 +13,7 @@ import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from
 export const ZDocumentAuditLogTypeSchema = z.enum([
   // Document actions.
   'EMAIL_SENT',
+  'EMAIL_OPENED',
 
   // Document modification events.
   'FIELD_CREATED',
@@ -248,6 +249,17 @@ export const ZDocumentAuditLogEventEmailSentSchema = z.object({
   data: ZBaseRecipientDataSchema.extend({
     emailType: ZDocumentAuditLogEmailTypeSchema,
     isResending: z.boolean(),
+  }),
+});
+
+/**
+ * Event: Email opened (pixel tracking).
+ */
+export const ZDocumentAuditLogEventEmailOpenedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED),
+  data: ZBaseRecipientDataSchema.extend({
+    emailType: ZDocumentAuditLogEmailTypeSchema,
+    isPixelTracked: z.boolean().optional(),
   }),
 });
 
@@ -756,6 +768,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventEnvelopeItemUpdatedSchema,
     ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
+    ZDocumentAuditLogEventEmailOpenedSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,

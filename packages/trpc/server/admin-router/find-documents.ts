@@ -8,9 +8,9 @@ export const findDocumentsRoute = adminProcedure
   .input(ZFindDocumentsRequestSchema)
   .output(ZFindDocumentsResponseSchema)
   .query(async ({ input }) => {
-    const { query, page, perPage } = input;
+    const { query, page, perPage, status, dateFrom, dateTo, teamId, ownerEmail, orderBy, orderByDirection } = input;
 
-    const result = await adminFindDocuments({ query, page, perPage });
+    const result = await adminFindDocuments({ query, page, perPage, status, dateFrom, dateTo, teamId, ownerEmail, orderBy, orderByDirection });
 
     return {
       ...result,

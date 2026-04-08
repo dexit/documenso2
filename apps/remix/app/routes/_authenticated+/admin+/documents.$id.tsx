@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
-import { DownloadIcon } from 'lucide-react';
+import { DownloadIcon, ExternalLinkIcon, MailIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
@@ -59,6 +59,12 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
   const { _, i18n } = useLingui();
   const { toast } = useToast();
+
+  const { mutate: resendEmail, isPending: isResendEmailLoading, variables: resendVariables } =
+    trpc.admin.document.resendEmail.useMutation({
+      onSuccess: () => toast({ title: _(msg`Email sent`), description: _(msg`Email resent to recipient.`) }),
+      onError: () => toast({ title: _(msg`Error`), description: _(msg`Failed to resend email.`), variant: 'destructive' }),
+    });
 
   const { mutate: resealDocument, isPending: isResealDocumentLoading } =
     trpc.admin.document.reseal.useMutation({
@@ -117,17 +123,22 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
         )}
       </div>
 
-      <div className="mt-4 text-sm text-muted-foreground">
+      <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-muted-foreground md:grid-cols-4">
         <div>
-          <Trans>Document ID</Trans>: {mapSecondaryIdToDocumentId(envelope.secondaryId)}
+          <span className="font-medium text-foreground"><Trans>Document ID</Trans></span>
+          <p>{mapSecondaryIdToDocumentId(envelope.secondaryId)}</p>
         </div>
-
         <div>
-          <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
+          <span className="font-medium text-foreground"><Trans>Team</Trans></span>
+          <p>{(envelope as { team?: { name?: string } | null }).team?.name ?? <Trans>Personal</Trans>}</p>
         </div>
-
         <div>
-          <Trans>Last updated at</Trans>: {i18n.date(envelope.updatedAt, DateTime.DATETIME_MED)}
+          <span className="font-medium text-foreground"><Trans>Created</Trans></span>
+          <p>{i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}</p>
+        </div>
+        <div>
+          <span className="font-medium text-foreground"><Trans>Last updated</Trans></span>
+          <p>{i18n.date(envelope.updatedAt, DateTime.DATETIME_MED)}</p>
         </div>
       </div>
 
@@ -198,36 +209,54 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
               </AccordionTrigger>
 
               <AccordionContent className="border-t px-4 pt-4">
-                <div className="mb-4 grid grid-cols-4 gap-4 text-sm">
+                <div className="mb-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                   <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Send Status</Trans>
-                    </span>
+                    <span className="text-muted-foreground"><Trans>Send Status</Trans></span>
                     <p className="font-medium">{recipient.sendStatus}</p>
                   </div>
-
                   <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Read Status</Trans>
-                    </span>
+                    <span className="text-muted-foreground"><Trans>Read Status</Trans></span>
                     <p className="font-medium">{recipient.readStatus}</p>
                   </div>
-
                   <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Signing Status</Trans>
-                    </span>
+                    <span className="text-muted-foreground"><Trans>Signing Status</Trans></span>
                     <p className="font-medium">{recipient.signingStatus}</p>
                   </div>
-
                   <div>
-                    <span className="text-muted-foreground">
-                      <Trans>Completed At</Trans>
-                    </span>
+                    <span className="text-muted-foreground"><Trans>Completed At</Trans></span>
                     <p className="font-medium">
                       {recipient.signedAt ? <LocalTime date={recipient.signedAt} /> : '-'}
                     </p>
                   </div>
+                </div>
+
+                {/* Actions row */}
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  {recipient.signingStatus !== SigningStatus.SIGNED && recipient.role !== RecipientRole.CC && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-1.5 text-xs"
+                      loading={isResendEmailLoading && resendVariables?.recipientId === recipient.id}
+                      disabled={isResendEmailLoading}
+                      onClick={() => resendEmail({ envelopeId: envelope.id, recipientId: recipient.id })}
+                    >
+                      <MailIcon className="h-3.5 w-3.5" />
+                      <Trans>Resend email</Trans>
+                    </Button>
+                  )}
+                  {recipient.signingStatus !== SigningStatus.SIGNED && (
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs" asChild>
+                      <a
+                        href={`${typeof window !== 'undefined' ? window.location.origin : ''}/sign/${recipient.token}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <ExternalLinkIcon className="h-3.5 w-3.5" />
+                        <Trans>Signing link</Trans>
+                      </a>
+                    </Button>
+                  )}
                 </div>
 
                 <hr className="mb-4" />

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import { DocumentStatus, RecipientRole, TeamMemberRole } from '@prisma/client';
 import {
   CheckCircle,
   Copy,
@@ -14,6 +14,7 @@ import {
   Loader,
   MoreHorizontal,
   Pencil,
+  RotateCcw,
   Share,
   Trash2,
 } from 'lucide-react';
@@ -22,6 +23,8 @@ import { Link } from 'react-router';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -34,6 +37,7 @@ import {
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
+import { DocumentResealDialog } from '~/components/dialogs/document-reseal-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
@@ -56,6 +60,7 @@ export const DocumentsTableActionDropdown = ({
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isResealDialogOpen, setResealDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -72,6 +77,13 @@ export const DocumentsTableActionDropdown = ({
   const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
 
   const nonSignedRecipients = row.recipients.filter((item) => item.signingStatus !== 'SIGNED');
+
+  const isUserAdmin = isAdmin(user);
+  const isUserManagerOrAbove =
+    isCurrentTeamDocument &&
+    (team.currentTeamRole === TeamMemberRole.ADMIN || team.currentTeamRole === TeamMemberRole.MANAGER);
+
+  const canReseal = isUserAdmin || isUserManagerOrAbove;
 
   return (
     <DropdownMenu>
@@ -147,6 +159,13 @@ export const DocumentsTableActionDropdown = ({
           </DropdownMenuItem>
         )}
 
+        {isComplete && canReseal && (
+          <DropdownMenuItem onClick={() => setResealDialogOpen(true)}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            <Trans>Reseal</Trans>
+          </DropdownMenuItem>
+        )}
+
         {/* No point displaying this if there's no functionality. */}
         {/* <DropdownMenuItem disabled>
           <XCircle className="mr-2 h-4 w-4" />
@@ -206,6 +225,13 @@ export const DocumentsTableActionDropdown = ({
         token={recipient?.token}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
+      />
+
+      <DocumentResealDialog
+        documentId={mapSecondaryIdToDocumentId(row.secondaryId)}
+        documentTitle={row.title}
+        open={isResealDialogOpen}
+        onOpenChange={setResealDialogOpen}
       />
     </DropdownMenu>
   );

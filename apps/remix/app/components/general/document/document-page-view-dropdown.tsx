@@ -2,13 +2,14 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import {
   Copy,
   Download,
   Edit,
   Loader,
   MoreHorizontal,
+  RotateCcw,
   ScrollTextIcon,
   Share,
   Trash2,
@@ -19,6 +20,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -28,10 +30,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
+import { DocumentResealDialog } from '~/components/dialogs/document-reseal-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
@@ -43,7 +45,6 @@ export type DocumentPageViewDropdownProps = {
 
 export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownProps) => {
   const { user } = useSession();
-  const { toast } = useToast();
   const { _ } = useLingui();
 
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isResealDialogOpen, setResealDialogOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -65,6 +67,13 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const documentsPath = formatDocumentsPath(team.url);
 
   const nonSignedRecipients = envelope.recipients.filter((item) => item.signingStatus !== 'SIGNED');
+
+  const isUserAdmin = isAdmin(user);
+  const isUserManagerOrAbove =
+    isCurrentTeamDocument &&
+    (team.currentTeamRole === TeamMemberRole.ADMIN || team.currentTeamRole === TeamMemberRole.MANAGER);
+
+  const canReseal = isUserAdmin || isUserManagerOrAbove;
 
   return (
     <DropdownMenu>
@@ -112,6 +121,13 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           <Copy className="mr-2 h-4 w-4" />
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
+
+        {isComplete && canReseal && (
+          <DropdownMenuItem onClick={() => setResealDialogOpen(true)}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            <Trans>Reseal</Trans>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={isDeleted}>
           <Trash2 className="mr-2 h-4 w-4" />
@@ -179,6 +195,13 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           onOpenChange={setDuplicateDialogOpen}
         />
       )}
+
+      <DocumentResealDialog
+        documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+        documentTitle={envelope.title}
+        open={isResealDialogOpen}
+        onOpenChange={setResealDialogOpen}
+      />
     </DropdownMenu>
   );
 };

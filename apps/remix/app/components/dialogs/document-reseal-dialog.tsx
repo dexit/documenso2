@@ -16,14 +16,14 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DocumentResealDialogProps = {
-  documentId: number;
+  envelopeId: string;
   documentTitle: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
 export const DocumentResealDialog = ({
-  documentId,
+  envelopeId,
   documentTitle,
   open,
   onOpenChange,
@@ -82,7 +82,7 @@ export const DocumentResealDialog = ({
           <Button
             type="button"
             loading={isPending}
-            onClick={() => void resealDocument({ documentId })}
+            onClick={() => void resealDocument({ envelopeId })}
           >
             <Trans>Reseal</Trans>
           </Button>

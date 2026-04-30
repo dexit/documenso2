@@ -23,7 +23,6 @@ import { Link } from 'react-router';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -228,7 +227,7 @@ export const DocumentsTableActionDropdown = ({
       />
 
       <DocumentResealDialog
-        documentId={mapSecondaryIdToDocumentId(row.secondaryId)}
+        envelopeId={row.envelopeId}
         documentTitle={row.title}
         open={isResealDialogOpen}
         onOpenChange={setResealDialogOpen}

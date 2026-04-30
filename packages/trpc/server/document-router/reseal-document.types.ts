@@ -13,7 +13,7 @@ export const resealDocumentMeta: TrpcRouteMeta = {
 };
 
 export const ZResealDocumentRequestSchema = z.object({
-  documentId: z.number(),
+  envelopeId: z.string(),
 });
 
 export const ZResealDocumentResponseSchema = ZSuccessResponseSchema;

@@ -1,9 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
-
-import { jobs } from '@documenso/lib/jobs/client';
-import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { resealDocument } from '@documenso/lib/server-only/document/reseal-document';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -23,21 +18,12 @@ export const resealDocumentRoute = adminProcedure
       },
     });
 
-    const envelope = await unsafeGetEntireEnvelope({
+    await resealDocument({
+      userId: ctx.user.id,
+      teamId: -1, // Admins bypass team check in the library function.
       id: {
         type: 'envelopeId',
         id,
-      },
-      type: EnvelopeType.DOCUMENT,
-    });
-
-    const isResealing = isDocumentCompleted(envelope.status);
-
-    await jobs.triggerJob({
-      name: 'internal.seal-document',
-      payload: {
-        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-        isResealing,
       },
     });
   });

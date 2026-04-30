@@ -14,11 +14,11 @@ export const resealDocumentRoute = authenticatedProcedure
   .output(ZResealDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
-    const { documentId } = input;
+    const { envelopeId } = input;
 
     ctx.logger.info({
       input: {
-        documentId,
+        envelopeId,
       },
     });
 
@@ -26,8 +26,8 @@ export const resealDocumentRoute = authenticatedProcedure
       userId: ctx.user.id,
       teamId,
       id: {
-        type: 'documentId',
-        id: documentId,
+        type: 'envelopeId',
+        id: envelopeId,
       },
     });
 

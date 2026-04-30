@@ -197,7 +197,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
       )}
 
       <DocumentResealDialog
-        documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+        envelopeId={envelope.id}
         documentTitle={envelope.title}
         open={isResealDialogOpen}
         onOpenChange={setResealDialogOpen}

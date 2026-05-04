@@ -10,7 +10,7 @@ import {
   SendStatus,
 } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -189,7 +189,7 @@ export const run = async ({
         }),
       ]);
 
-      await mailer.sendMail({
+      await sendEmail({
         to: {
           name: recipient.name,
           address: recipient.email,

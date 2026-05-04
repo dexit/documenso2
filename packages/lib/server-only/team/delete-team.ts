@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { OrganisationGroupType, type Team } from '@prisma/client';
 import { uniqueBy } from 'remeda';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -144,7 +144,7 @@ export const sendTeamDeleteEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await sendEmail({
     to: email,
     from: senderEmail,
     subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),

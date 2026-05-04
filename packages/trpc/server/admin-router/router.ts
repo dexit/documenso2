@@ -26,6 +26,13 @@ import { updateSiteSettingRoute } from './update-site-setting';
 import { updateSubscriptionClaimRoute } from './update-subscription-claim';
 import { updateUserRoute } from './update-user';
 
+import { findApiLogsRoute } from './find-api-logs';
+import { findEmailLogsRoute } from './find-email-logs';
+import { findWebhookLogsRoute } from './find-webhook-logs';
+import { replayWebhookRoute } from './replay-webhook';
+import { findBackgroundJobsRoute } from './find-background-jobs';
+import { retryBackgroundJobRoute } from './retry-background-job';
+
 export const adminRouter = router({
   organisation: {
     find: findAdminOrganisationsRoute,
@@ -67,6 +74,16 @@ export const adminRouter = router({
   },
   recipient: {
     update: updateRecipientRoute,
+  },
+  logs: {
+    findApiLogs: findApiLogsRoute,
+    findEmailLogs: findEmailLogsRoute,
+    findWebhookLogs: findWebhookLogsRoute,
+    replayWebhook: replayWebhookRoute,
+  },
+  jobs: {
+    find: findBackgroundJobsRoute,
+    retry: retryBackgroundJobRoute,
   },
   updateSiteSetting: updateSiteSettingRoute,
 });

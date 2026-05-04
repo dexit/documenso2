@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import crypto from 'crypto';
 import { DateTime } from 'luxon';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { OrganisationAccountLinkConfirmationTemplate } from '@documenso/email/templates/organisation-account-link-confirmation';
 import { getI18nInstance } from '@documenso/lib/client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -103,7 +103,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  return mailer.sendMail({
+  return sendEmail({
     to: {
       address: user.email,
       name: user.name || '',

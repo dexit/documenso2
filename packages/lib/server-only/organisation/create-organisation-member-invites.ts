@@ -6,7 +6,7 @@ import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
@@ -211,7 +211,7 @@ export const sendOrganisationMemberInviteEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await sendEmail({
     to: email,
     from: senderEmail,
     subject: i18n._(msg`You have been invited to join ${organisation.name} on Documenso`),

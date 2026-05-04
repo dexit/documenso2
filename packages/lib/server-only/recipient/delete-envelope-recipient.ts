@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType, SendStatus } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -169,7 +169,7 @@ export const deleteEnvelopeRecipient = async ({
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await sendEmail({
       to: {
         address: recipientToDelete.email,
         name: recipientToDelete.name,

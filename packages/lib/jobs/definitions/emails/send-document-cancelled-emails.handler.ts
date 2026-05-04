@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -102,7 +102,7 @@ export const run = async ({
           }),
         ]);
 
-        await mailer.sendMail({
+        await sendEmail({
           to: {
             name: recipient.name,
             address: recipient.email,

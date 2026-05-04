@@ -73,6 +73,8 @@ model User {
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  apiLogs             ApiLog[]       @relation("UserApiLogs")
+  emailLogs           EmailLog[]     @relation("UserEmailLogs")
 
   @@index([email])
 }
@@ -905,6 +907,8 @@ model Team {
 
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
+  apiLogs             ApiLog[]       @relation("TeamApiLogs")
+  emailLogs           EmailLog[]     @relation("TeamEmailLogs")
 
   @@index([name])
   @@index([organisationId])
@@ -1075,4 +1079,84 @@ model OrganisationAuthenticationPortal {
 model Counter {
   id    String @id
   value Int
+}
+
+enum ApiLogStatus {
+  SUCCESS
+  ERROR
+}
+
+model ApiLog {
+  id              String   @id @default(cuid())
+  method          String
+  path            String
+  query           Json?
+  requestHeaders  Json?
+  requestBody     Json?
+  responseStatus  Int
+  responseHeaders Json?
+  responseBody    Json?
+  duration        Int
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime @default(now())
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull, name: "UserApiLogs")
+
+  teamId Int?
+  team   Team? @relation(fields: [teamId], references: [id], onDelete: SetNull, name: "TeamApiLogs")
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([createdAt])
+}
+
+enum EmailLogStatus {
+  SENT
+  FAILED
+}
+
+model EmailLog {
+  id        String         @id @default(cuid())
+  recipient String
+  subject   String
+  body      String?
+  from      String?
+  status    EmailLogStatus
+  error     String?
+  createdAt DateTime       @default(now())
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull, name: "UserEmailLogs")
+
+  teamId Int?
+  team   Team? @relation(fields: [teamId], references: [id], onDelete: SetNull, name: "TeamEmailLogs")
+
+  interactions EmailInteraction[]
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([recipient])
+  @@index([createdAt])
+}
+
+enum EmailInteractionType {
+  OPEN
+  CLICK
+  BOUNCE
+  DELIVERED
+}
+
+model EmailInteraction {
+  id        String               @id @default(cuid())
+  type      EmailInteractionType
+  metadata  Json?
+  createdAt DateTime             @default(now())
+
+  emailLogId String
+  emailLog   EmailLog @relation(fields: [emailLogId], references: [id], onDelete: Cascade)
+
+  @@index([emailLogId])
+  @@index([createdAt])
 }

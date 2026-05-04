@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { DocumentSuperDeleteEmailTemplate } from '@documenso/email/templates/document-super-delete';
 import { prisma } from '@documenso/prisma';
 
@@ -80,7 +80,7 @@ export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOpt
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await sendEmail({
     to: {
       address: email,
       name: name || '',

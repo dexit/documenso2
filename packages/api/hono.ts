@@ -9,11 +9,14 @@ import { listDocumentsHandler } from '@documenso/lib/server-only/webhooks/zapier
 import { subscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/subscribe';
 import { unsubscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/unsubscribe';
 // This is a bit nasty. Todo: Extract
+import { loggingMiddleware } from '@documenso/api/v1/middleware/logging';
 import type { HonoEnv } from '@documenso/remix/server/router';
 
 // This is bad, ts-router will be created on each request.
 // But don't really have a choice here.
 export const tsRestHonoApp = new Hono<HonoEnv>();
+
+tsRestHonoApp.use('*', loggingMiddleware());
 
 tsRestHonoApp
   .get('/openapi', (c) => c.redirect('https://openapi-v1.documenso.com'))

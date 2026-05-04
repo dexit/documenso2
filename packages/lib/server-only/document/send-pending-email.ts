@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
 
@@ -93,7 +93,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await sendEmail({
     to: {
       address: email,
       name,

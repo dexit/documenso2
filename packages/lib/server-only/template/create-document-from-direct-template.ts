@@ -18,7 +18,7 @@ import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
@@ -773,7 +773,7 @@ export const createDocumentFromDirectTemplate = async ({
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await sendEmail({
       to: [
         {
           name: templateOwner.name || '',

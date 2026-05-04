@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 
@@ -234,7 +234,7 @@ const handleDocumentOwnerDelete = async ({
 
       const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
+      await sendEmail({
         to: {
           address: recipient.email,
           name: recipient.name,

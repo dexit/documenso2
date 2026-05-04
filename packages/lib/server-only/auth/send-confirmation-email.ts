@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
@@ -57,7 +57,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
 
   const i18n = await getI18nInstance();
 
-  return mailer.sendMail({
+  return sendEmail({
     to: {
       address: user.email,
       name: user.name || '',

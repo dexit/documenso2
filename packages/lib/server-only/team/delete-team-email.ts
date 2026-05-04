@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
@@ -89,7 +89,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await sendEmail({
       to: {
         address: team.organisation.owner.email,
         name: team.organisation.owner.name ?? '',

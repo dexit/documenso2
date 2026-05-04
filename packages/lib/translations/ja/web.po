@@ -871,8 +871,8 @@ msgid "A means to print or download documents for your records"
 msgstr "記録用に文書を印刷またはダウンロードする手段"
 
 #: packages/email/templates/organisation-join.tsx
-msgid "A member has joined your organisation on Documenso"
-msgstr "メンバーが Documenso の組織に参加しました"
+msgid "A member has joined your organisation on PG eSign"
+msgstr ""
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
@@ -883,8 +883,8 @@ msgid "A member has left your organisation {organisationName}"
 msgstr "メンバーが組織 {organisationName} を離れました"
 
 #: packages/email/templates/organisation-leave.tsx
-msgid "A member has left your organisation on Documenso"
-msgstr "メンバーが Documenso の組織を離れました"
+msgid "A member has left your organisation on PG eSign"
+msgstr ""
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-joined-email.handler.ts
 msgid "A new member has joined your organisation"
@@ -977,8 +977,8 @@ msgid "Accept & Link Account"
 msgstr "アカウントを承認してリンク"
 
 #: packages/email/templates/organisation-invite.tsx
-msgid "Accept invitation to join an organisation on Documenso"
-msgstr "Documenso の組織参加招待を承諾"
+msgid "Accept invitation to join an organisation on PG eSign"
+msgstr ""
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Accept team email request for {teamName} on Documenso"
@@ -1818,6 +1818,11 @@ msgstr "すべてのソース"
 msgid "Any Status"
 msgstr "すべてのステータス"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.api.tsx
+msgid "API Logs"
+msgstr ""
+
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
@@ -2078,6 +2083,7 @@ msgid "Background Color"
 msgstr "背景色"
 
 #: apps/remix/app/components/tables/admin-document-jobs-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/jobs._index.tsx
 msgid "Background Jobs"
 msgstr "バックグラウンドジョブ"
 
@@ -3039,10 +3045,6 @@ msgstr "Webhook を作成"
 msgid "Create Webhook"
 msgstr "Webhook を作成"
 
-#: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
-msgid "Create your account and start using state-of-the-art document signing."
-msgstr "アカウントを作成して、最先端の文書署名を今すぐ始めましょう。"
-
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "アカウントを作成して、最先端の文書署名を今すぐ始めましょう。オープンで美しい署名体験があなたを待っています。"
@@ -3167,7 +3169,6 @@ msgstr "David は従業員で、Lucas はマネージャーです"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
-#: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "辞退"
 
@@ -3452,8 +3453,8 @@ msgid "Device"
 msgstr "デバイス"
 
 #: packages/email/templates/reset-password.tsx
-msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
-msgstr "パスワード変更をリクエストしていませんか？アカウントの安全確保をお手伝いしますので、<0>こちらからお問い合わせください</0>。"
+msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>."
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -3943,6 +3944,7 @@ msgstr "ドキュメント"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
+#: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -4287,6 +4289,11 @@ msgstr "メールドメインを同期しました"
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Email is required"
 msgstr "メールは必須です"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.email.tsx
+msgid "Email Logs"
+msgstr ""
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Email Options"
@@ -5097,6 +5104,7 @@ msgstr "ホームに戻る"
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Go Back Home"
 msgstr "ホームに戻る"
 
@@ -5167,6 +5175,11 @@ msgstr "グループ名"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "Groups"
 msgstr "グループ"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+msgid "Have any questions ? <0>Check out Pathway Group.</0>."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -5385,6 +5398,10 @@ msgstr "監査ログをドキュメントに含める"
 msgid "Include the Signing Certificate in the Document"
 msgstr "署名証明書をドキュメントに含める"
 
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Includes:"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
@@ -5460,6 +5477,10 @@ msgstr "無効なドメイン"
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "無効なメールアドレスです"
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
+msgid "Invalid embedding presign token provided"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5584,9 +5605,13 @@ msgstr "現在はあなたの署名順ではありません。まもなくこの
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "現在はあなたの署名順ではありません。順番が来ると、文書への署名方法を記載したメールが届きます。"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Jobs"
+msgstr ""
+
 #: packages/email/templates/organisation-invite.tsx
-msgid "Join {organisationName} on Documenso"
-msgstr "{organisationName} に Documenso で参加"
+msgid "Join {organisationName} on PG eSign"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Join our community on <0>Discord</0> for community support and discussion."
@@ -5814,6 +5839,8 @@ msgstr "候補を読み込み中..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
+#: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
 msgstr "読み込み中..."
 
@@ -6217,10 +6244,6 @@ msgstr "名前は必須です"
 msgid "Name Settings"
 msgstr "名前の設定"
 
-#: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
-msgid "Need to sign documents?"
-msgstr "文書への署名が必要ですか？"
-
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Needs to approve"
 msgstr "承認が必要"
@@ -6240,6 +6263,10 @@ msgstr "なし"
 #: apps/remix/app/components/forms/token.tsx
 msgid "Never expire"
 msgstr "有効期限なし"
+
+#: apps/remix/app/routes/_authenticated+/dashboard.tsx
+msgid "New"
+msgstr ""
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
@@ -6441,6 +6468,10 @@ msgstr "なし（グローバル設定を上書き）"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Not found"
 msgstr "見つかりません"
+
+#: apps/remix/app/routes/embed+/_v0+/_layout.tsx
+msgid "Not Found"
+msgstr ""
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Not supported"
@@ -7794,10 +7825,6 @@ msgstr "戻る"
 msgid "Return Home"
 msgstr "ホームに戻る"
 
-#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
-msgid "Return to Documenso sign in page here"
-msgstr "Documenso のサインインページへ戻る"
-
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Return to documents"
 msgstr "文書一覧に戻る"
@@ -7805,6 +7832,10 @@ msgstr "文書一覧に戻る"
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
 msgid "Return to Home"
 msgstr "ホームに戻る"
+
+#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+msgid "Return to PG eSign - sign in page here"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 #: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
@@ -8377,9 +8408,12 @@ msgstr "サインイン"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
-#: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Sign in to your account"
 msgstr "アカウントにサインイン"
+
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "Sign in to your PG eSign account"
+msgstr ""
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
@@ -10745,6 +10779,11 @@ msgstr "閲覧"
 msgid "View activity"
 msgstr "アクティビティを表示"
 
+#: apps/remix/app/routes/_authenticated+/dashboard.tsx
+#: apps/remix/app/routes/_authenticated+/dashboard.tsx
+msgid "View all"
+msgstr ""
+
 #: packages/email/templates/confirm-team-email.tsx
 msgid "View all documents sent to and from this email address"
 msgstr "このメールアドレスから送受信されたすべてのドキュメントを表示"
@@ -10910,11 +10949,6 @@ msgstr "他の人の署名待ち"
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Waiting for Your Turn"
 msgstr "あなたの順番待ち"
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-#: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr "このようなスマートな署名リンクを送りたいですか？<0>Documenso をチェックしてみてください</0>。"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
@@ -11295,6 +11329,11 @@ msgstr "Webhook を削除しました"
 msgid "Webhook Details"
 msgstr "Webhook の詳細"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/logs.webhooks.tsx
+msgid "Webhook Logs"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Webhook not found"
 msgstr "Webhook が見つかりません"
@@ -11323,10 +11362,6 @@ msgstr "Webhook"
 msgid "Welcome"
 msgstr "ようこそ"
 
-#: apps/remix/app/routes/_unauthenticated+/signin.tsx
-msgid "Welcome back, we are lucky to have you."
-msgstr "おかえりなさい。あなたにまたお会いできて嬉しいです。"
-
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
 msgstr "お帰りなさい！アカウントの概要をご確認ください。"
@@ -11338,6 +11373,10 @@ msgstr "{organisationName} へようこそ"
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
 msgstr "Documenso へようこそ！"
+
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "Welcome to Pathway Group - Document eSign platform!"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Well-known URL is required"
@@ -12446,4 +12485,3 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

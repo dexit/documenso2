@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
 
@@ -32,7 +32,7 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
     renderEmailWithI18N(template, { plainText: true }),
   ]);
 
-  return await mailer.sendMail({
+  return await sendEmail({
     to: {
       address: user.email,
       name: user.name || '',

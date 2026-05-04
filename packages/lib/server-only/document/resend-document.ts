@@ -9,7 +9,7 @@ import {
   SigningStatus,
 } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -194,7 +194,7 @@ export const resendDocument = async ({
 
       await prisma.$transaction(
         async (tx) => {
-          await mailer.sendMail({
+          await sendEmail({
             to: {
               address: email,
               name,

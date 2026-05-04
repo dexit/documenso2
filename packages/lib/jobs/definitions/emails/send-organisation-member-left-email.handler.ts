@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import OrganisationLeaveEmailTemplate from '@documenso/email/templates/organisation-leave';
 import { prisma } from '@documenso/prisma';
 
@@ -101,7 +101,7 @@ export const run = async ({
 
         const i18n = await getI18nInstance(emailLanguage);
 
-        await mailer.sendMail({
+        await sendEmail({
           to: member.user.email,
           from: senderEmail,
           subject: i18n._(msg`A member has left your organisation`),

@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
@@ -105,7 +105,7 @@ export const run = async ({
         }),
       ]);
 
-      await mailer.sendMail({
+      await sendEmail({
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -140,7 +140,7 @@ export const run = async ({
       }),
     ]);
 
-    await mailer.sendMail({
+    await sendEmail({
       to: {
         name: documentOwner.name || '',
         address: documentOwner.email,

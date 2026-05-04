@@ -7,6 +7,10 @@ import {
   Trophy,
   Users,
   Wallet2,
+  Terminal,
+  Mail,
+  Webhook,
+  PlayCircle
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
@@ -133,6 +137,62 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Organisation Insights</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/logs/api') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/api">
+              <Terminal className="mr-2 h-5 w-5" />
+              <Trans>API Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/logs/email') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/email">
+              <Mail className="mr-2 h-5 w-5" />
+              <Trans>Email Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/logs/webhooks') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/logs/webhooks">
+              <Webhook className="mr-2 h-5 w-5" />
+              <Trans>Webhook Logs</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/jobs') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/jobs">
+              <PlayCircle className="mr-2 h-5 w-5" />
+              <Trans>Jobs</Trans>
             </Link>
           </Button>
 

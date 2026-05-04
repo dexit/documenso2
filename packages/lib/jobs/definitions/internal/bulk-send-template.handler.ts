@@ -4,7 +4,7 @@ import { msg } from '@lingui/macro';
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-complete';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
@@ -193,7 +193,7 @@ export const run = async ({
       }),
     ]);
 
-    await mailer.sendMail({
+    await sendEmail({
       to: {
         name: user.name || '',
         address: user.email,

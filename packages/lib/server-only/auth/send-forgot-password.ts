@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { ForgotPasswordTemplate } from '@documenso/email/templates/forgot-password';
 import { prisma } from '@documenso/prisma';
 
@@ -50,7 +50,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
 
   const i18n = await getI18nInstance();
 
-  return await mailer.sendMail({
+  return await sendEmail({
     to: {
       address: user.email,
       name: user.name || '',

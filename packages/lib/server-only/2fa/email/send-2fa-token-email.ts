@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
+import { sendEmail } from '@documenso/email';
 import { AccessAuth2FAEmailTemplate } from '@documenso/email/templates/access-auth-2fa';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -110,7 +110,7 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
 
   await prisma.$transaction(
     async (tx) => {
-      await mailer.sendMail({
+      await sendEmail({
         to: {
           address: recipient.email,
           name: recipient.name,

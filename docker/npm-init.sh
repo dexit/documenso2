@@ -8,9 +8,9 @@
 # Env vars (all optional — sensible defaults shown):
 #   NPM_ADMIN_EMAIL       admin email (default: admin@example.com)
 #   NPM_ADMIN_PASSWORD    admin password (default: changeme)
-#   DOCUMENSO_DOMAIN      main app domain   (e.g. docs.example.com)
+#   DOCUMENSO_DOMAIN      main app domain      (e.g. docs.example.com)
 #   MINIO_DOMAIN          Minio console domain (e.g. minio.example.com)
-#   STATUS_DOMAIN         Uptime Kuma domain   (e.g. status.example.com)
+#   CHECKMATE_DOMAIN      Checkmate domain     (e.g. status.example.com)
 #   NPM_DOMAIN            NPM admin domain     (e.g. npm.example.com)
 # ─────────────────────────────────────────────────────────────────────────────
 set -e
@@ -21,7 +21,7 @@ ADMIN_PASSWORD="${NPM_ADMIN_PASSWORD:-changeme}"
 
 DOCUMENSO_DOMAIN="${DOCUMENSO_DOMAIN:-}"
 MINIO_DOMAIN="${MINIO_DOMAIN:-}"
-STATUS_DOMAIN="${STATUS_DOMAIN:-}"
+CHECKMATE_DOMAIN="${CHECKMATE_DOMAIN:-}"
 NPM_DOMAIN="${NPM_DOMAIN:-}"
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -155,13 +155,13 @@ create_proxy_host \
   "true" \
   "Minio Console"
 
-# Uptime Kuma (status page)
+# Checkmate (status / monitoring)
 create_proxy_host \
-  "${STATUS_DOMAIN}" \
-  "uptime-kuma" \
-  "3001" \
+  "${CHECKMATE_DOMAIN}" \
+  "checkmate" \
+  "52345" \
   "true" \
-  "Uptime Kuma"
+  "Checkmate"
 
 # NPM admin UI (proxy to itself — useful if you want it on a clean domain)
 create_proxy_host \

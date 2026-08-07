@@ -1,4 +1,3 @@
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { verifyEmailTrackingToken } from '@documenso/lib/utils/email-tracking';
 import { prisma } from '@documenso/prisma';
@@ -47,7 +46,7 @@ export async function loader({ request }: { request: Request }) {
 
       await prisma.documentAuditLog.create({
         data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED,
+          type: 'EMAIL_OPENED',
           envelopeId,
           email: recipient.email,
           name: recipient.name,

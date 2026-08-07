@@ -16,8 +16,7 @@ import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '../../types/subscription';
 import { env } from '../../utils/env';
 
 const LICENSE_KEY = env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY');
-const LICENSE_SERVER_URL =
-  env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
+const LICENSE_SERVER_URL = env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -70,10 +69,10 @@ export class LicenseClient {
   }
 
   public async getCachedLicense(): Promise<TCachedLicense | null> {
-    // Super bypass: NEXT_PRIVATE_SUPER_BYPASS_LICENSE=true disables all license checks.
-    const superBypass = env('NEXT_PRIVATE_SUPER_BYPASS_LICENSE');
-    if (superBypass === 'true' || superBypass === '1') {
-      return this.buildBypassLicense('super-bypass');
+    if (this.isSuperBypassActive()) {
+      const bypass = this.buildBypassLicense('super-bypass');
+      this.cachedLicense = bypass;
+      return bypass;
     }
 
     if (this.cachedLicense) {
@@ -86,44 +85,24 @@ export class LicenseClient {
   }
 
   /**
-   * Build a fully-enabled bypass license (used for super bypass and org-level bypass).
-   */
-  private buildBypassLicense(licenseKey: string): TCachedLicense {
-    return {
-      lastChecked: new Date().toISOString(),
-      license: {
-        status: 'ACTIVE',
-        createdAt: new Date(),
-        name: 'Bypass License',
-        periodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        cancelAtPeriodEnd: false,
-        licenseKey,
-        flags: {
-          emailDomains: true,
-          embedAuthoring: true,
-          embedAuthoringWhiteLabel: true,
-          cfr21: true,
-          hipaa: true,
-          authenticationPortal: true,
-          billing: true,
-        },
-      },
-      requestedLicenseKey: licenseKey,
-      unauthorizedFlagUsage: false,
-      derivedStatus: 'ACTIVE',
-    };
-  }
-
-  /**
    * Force resync the license from the license server.
    *
    * This will re-ping the license server and update the cached license file.
    */
   public async resync(): Promise<void> {
+    if (this.isSuperBypassActive()) {
+      return;
+    }
+
     await this.initialize();
   }
 
   private async initialize(): Promise<void> {
+    if (this.isSuperBypassActive()) {
+      this.cachedLicense = this.buildBypassLicense('super-bypass');
+      return;
+    }
+
     // Check if "Pathway Group" organisation exists — if so, bypass license checks.
     try {
       const pathwayOrg = await prisma.organisation.findFirst({
@@ -199,6 +178,44 @@ export class LicenseClient {
     console.log(`[License] Derived Status: ${status}`);
     console.log(`[License] Status: ${response?.data?.status}`);
     console.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
+  }
+
+  /**
+   * Returns true when the NEXT_PRIVATE_SUPER_BYPASS_LICENSE env var is set to
+   * "true" or "1", disabling all license checks.
+   */
+  private isSuperBypassActive(): boolean {
+    const val = env('NEXT_PRIVATE_SUPER_BYPASS_LICENSE');
+    return val === 'true' || val === '1';
+  }
+
+  /**
+   * Build a fully-enabled bypass license (used for super bypass and org-level bypass).
+   */
+  private buildBypassLicense(licenseKey: string): TCachedLicense {
+    return {
+      lastChecked: new Date().toISOString(),
+      license: {
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        name: 'Bypass License',
+        periodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        cancelAtPeriodEnd: false,
+        licenseKey,
+        flags: {
+          emailDomains: true,
+          embedAuthoring: true,
+          embedAuthoringWhiteLabel: true,
+          cfr21: true,
+          hipaa: true,
+          authenticationPortal: true,
+          billing: true,
+        },
+      },
+      requestedLicenseKey: licenseKey,
+      unauthorizedFlagUsage: false,
+      derivedStatus: 'ACTIVE',
+    };
   }
 
   /**

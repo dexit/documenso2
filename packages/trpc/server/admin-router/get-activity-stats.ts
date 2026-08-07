@@ -38,12 +38,12 @@ export const getActivityStatsRoute = adminProcedure
       prisma.documentAuditLog.count({
         where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT, createdAt: { gte: weekStart } },
       }),
-      prisma.documentAuditLog.count({ where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED } }),
+      prisma.documentAuditLog.count({ where: { type: 'EMAIL_OPENED' } }),
       prisma.documentAuditLog.count({
-        where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED, createdAt: { gte: todayStart } },
+        where: { type: 'EMAIL_OPENED', createdAt: { gte: todayStart } },
       }),
       prisma.documentAuditLog.count({
-        where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED, createdAt: { gte: weekStart } },
+        where: { type: 'EMAIL_OPENED', createdAt: { gte: weekStart } },
       }),
       prisma.documentAuditLog.count({ where: { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT } }),
       prisma.documentAuditLog.count({

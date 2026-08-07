@@ -1,6 +1,6 @@
 name: documenso
 
-# ─── Shared environment for the app & worker ───────────────────────────────
+# ─── Shared environment for the app & worker ─────────────────────────────────────────────
 x-documenso-env: &documenso-env
   NODE_ENV: production
   PORT: ${PORT:-3000}
@@ -62,9 +62,9 @@ x-documenso-env: &documenso-env
   NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT:-50}
 
 services:
-  # ── Infrastructure ─────────────────────────────────────────────────────────
+  # ── Infrastructure ──────────────────────────────────────────────────────────────────
 
-  # ─── PostgreSQL ─────────────────────────────────────────────────────────────
+  # ─── PostgreSQL ─────────────────────────────────────────────────────────────────────
   database:
     image: postgres:15-alpine
     container_name: documenso-db
@@ -83,7 +83,7 @@ services:
     networks:
       - internal # DB never exposed to outside — accessed via container name
 
-  # ─── Redis (BullMQ backend) ──────────────────────────────────────────────────
+  # ─── Redis (BullMQ backend) ───────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: documenso-redis
@@ -99,7 +99,7 @@ services:
     networks:
       - internal
 
-  # ─── Minio (S3-compatible object storage) ───────────────────────────────────
+  # ─── Minio (S3-compatible object storage) ───────────────────────────────────────────────
   minio:
     image: minio/minio:latest
     container_name: documenso-minio
@@ -120,7 +120,7 @@ services:
     networks:
       - internal # Port 9000 (S3 API) and 9001 (console) accessible inside
 
-  # ─── Minio bucket initializer (one-shot) ────────────────────────────────────
+  # ─── Minio bucket initializer (one-shot) ───────────────────────────────────────────────
   minio-init:
     image: minio/mc:latest
     container_name: documenso-minio-init
@@ -142,9 +142,9 @@ services:
     networks:
       - internal
 
-  # ── Application ────────────────────────────────────────────────────────────
+  # ── Application ──────────────────────────────────────────────────────────────────
 
-  # ─── Documenso App ──────────────────────────────────────────────────────────
+  # ─── Documenso App ─────────────────────────────────────────────────────────────────────
   documenso:
     build:
       context: .
@@ -173,7 +173,7 @@ services:
       retries: 5
       start_period: 60s
 
-  # ─── BullMQ Worker (optional) ───────────────────────────────────────────────
+  # ─── BullMQ Worker (optional) ─────────────────────────────────────────────────────────────
   #
   # Start with: docker compose --profile worker up -d
   #
@@ -199,7 +199,7 @@ services:
     profiles:
       - worker
 
-  # ─── Inngest Dev Server (optional) ──────────────────────────────────────────
+  # ─── Inngest Dev Server (optional) ──────────────────────────────────────────────────────────
   #
   # Only when NEXT_PRIVATE_JOBS_PROVIDER=inngest.
   # Start with: docker compose --profile inngest up -d
@@ -218,9 +218,9 @@ services:
     profiles:
       - inngest
 
-  # ── Proxy & Ingress ────────────────────────────────────────────────────────
+  # ── Proxy & Ingress ──────────────────────────────────────────────────────────────────
 
-  # ─── Nginx Proxy Manager ────────────────────────────────────────────────────
+  # ─── Nginx Proxy Manager ─────────────────────────────────────────────────────────────
   #
   # The single ingress point for all HTTP/HTTPS traffic.
   # On first boot the npm-init service will auto-create proxy hosts.
@@ -255,7 +255,7 @@ services:
       - internal # Can reach all backend services by container name
       - public # Faces the host/internet
 
-  # ─── Nginx Proxy Manager — auto-configuration (one-shot) ────────────────────
+  # ─── Nginx Proxy Manager — auto-configuration (one-shot) ──────────────────────────────────
   #
   # Runs once after NPM is healthy and seeds it with proxy hosts for:
   #   DOCUMENSO_DOMAIN  → documenso:3000
@@ -287,9 +287,9 @@ services:
     networks:
       - internal
 
-  # ── Monitoring ─────────────────────────────────────────────────────────────
+  # ── Monitoring ──────────────────────────────────────────────────────────────────
 
-  # ─── Checkmate (Bluewave Labs) ───────────────────────────────────────────────
+  # ─── Checkmate (Bluewave Labs) ──────────────────────────────────────────────────────────
   #
   # Service health & uptime monitoring — https://github.com/bluewave-labs/checkmate
   # Monitors HTTP endpoints, TCP ports, Docker containers, and more.

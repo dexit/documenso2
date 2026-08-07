@@ -57,7 +57,7 @@ export const findEmailActivityRoute = adminProcedure
       }),
       prisma.documentAuditLog.count({ where }),
       prisma.documentAuditLog.count({ where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT } }),
-      prisma.documentAuditLog.count({ where: { type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_OPENED } }),
+      prisma.documentAuditLog.count({ where: { type: 'EMAIL_OPENED' } }),
     ]);
 
     type LogRow = { id: string; envelopeId: string; createdAt: Date; data: unknown; email: string | null; name: string | null; ipAddress: string | null; userAgent: string | null; type: string; envelope: { id: string; title: string; secondaryId: string; team: { name: string } | null; user: { name: string | null; email: string } | null } | null };

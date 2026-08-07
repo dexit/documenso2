@@ -96,11 +96,11 @@ export const DocumentDeleteDialog = ({
           <DialogDescription>
             {canManageDocument ? (
               <Trans>
-                You are about to delete <strong>"{documentTitle}"</strong>
+                You are about to delete <strong>"${documentTitle}"</strong>
               </Trans>
             ) : (
               <Trans>
-                You are about to hide <strong>"{documentTitle}"</strong>
+                You are about to hide <strong>"${documentTitle}"</strong>
               </Trans>
             )}
           </DialogDescription>
@@ -145,22 +145,25 @@ export const DocumentDeleteDialog = ({
                   </ul>
                 </AlertDescription>
               ))
-              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED), () => (
-                <AlertDescription>
-                  <p>
-                    <Trans>By deleting this document, the following will occur:</Trans>
-                  </p>
+              .with(
+                P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED, DocumentStatus.CANCELLED),
+                () => (
+                  <AlertDescription>
+                    <p>
+                      <Trans>By deleting this document, the following will occur:</Trans>
+                    </p>
 
-                  <ul className="mt-0.5 list-inside list-disc">
-                    <li>
-                      <Trans>The document will be hidden from your account</Trans>
-                    </li>
-                    <li>
-                      <Trans>Recipients will still retain their copy of the document</Trans>
-                    </li>
-                  </ul>
-                </AlertDescription>
-              ))
+                    <ul className="mt-0.5 list-inside list-disc">
+                      <li>
+                        <Trans>The document will be hidden from your account</Trans>
+                      </li>
+                      <li>
+                        <Trans>Recipients will still retain their copy of the document</Trans>
+                      </li>
+                    </ul>
+                  </AlertDescription>
+                ),
+              )
               .exhaustive()}
           </Alert>
         ) : (
